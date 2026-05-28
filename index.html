@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ResAcc - ระบบบัญชีและสต็อกร้านอาหารอัจฉริยะ</title>
+    <title>ResAcc - ระบบบัญชีและคลังวัตถุดิบร้านอาหารอัจฉริยะ</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts (Prompt) -->
@@ -42,8 +42,8 @@
                         primary: {
                             50: '#fff7ed',
                             100: '#ffedd5',
-                            500: '#ea580c', /* Restaurant orange theme */
-                            600: '#ca8a04',
+                            500: '#f97316', // สีส้มอาหารชวนน่าทาน
+                            600: '#ea580c',
                             700: '#c2410c',
                             900: '#7c2d12',
                         }
@@ -55,55 +55,58 @@
 </head>
 <body class="h-full flex flex-col md:flex-row overflow-hidden text-slate-800">
 
-    <!-- Sidebar Menu (Desktop) -->
+    <!-- Sidebar Menu (Desktop) / Bottom Navigation (Mobile) -->
     <aside class="hidden md:flex md:w-64 flex-col bg-slate-900 text-white h-full shrink-0">
         <div class="p-6 border-b border-slate-800 flex items-center gap-3">
-            <div class="bg-orange-500 p-2 rounded-lg text-slate-900">
-                <i data-lucide="chef-hat" class="w-6 h-6"></i>
+            <div class="bg-primary-500 p-2 rounded-lg text-white">
+                <i data-lucide="utensils" class="w-6 h-6"></i>
             </div>
             <div>
-                <h1 class="text-lg font-bold leading-none">ResAcc</h1>
-                <span class="text-xs text-orange-400 font-medium">บัญชี & สต็อกร้านอาหาร</span>
+                <h1 class="text-lg font-bold leading-none">ResAcc Cloud</h1>
+                <span class="text-xs text-slate-400">บัญชี & สต็อกร้านอาหาร</span>
             </div>
         </div>
         
         <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
-            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-left font-medium bg-orange-600 text-white">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-left font-medium bg-primary-600 text-white">
                 <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                <span>แดชบอร์ด</span>
+                <span>แดชบอร์ดสรุปผล</span>
             </button>
             <button onclick="switchTab('transactions')" id="nav-transactions" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-left font-medium text-slate-300 hover:bg-slate-800 hover:text-white">
                 <i data-lucide="receipt-text" class="w-5 h-5"></i>
-                <span>บันทึกรายรับ-จ่าย</span>
+                <span>บันทึกรายรับ-รายจ่าย</span>
             </button>
             <button onclick="switchTab('inventory')" id="nav-inventory" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-left font-medium text-slate-300 hover:bg-slate-800 hover:text-white">
                 <i data-lucide="boxes" class="w-5 h-5"></i>
-                <span>คลังวัตถุดิบ & สต็อก</span>
+                <span>คลังสต็อกวัตถุดิบ</span>
             </button>
             <button onclick="switchTab('budgets')" id="nav-budgets" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-left font-medium text-slate-300 hover:bg-slate-800 hover:text-white">
-                <i data-lucide="landmark" class="w-5 h-5"></i>
-                <span>ควบคุมฟิกคอส & งบ</span>
+                <i data-lucide="sliders" class="w-5 h-5"></i>
+                <span>ตั้งงบรายจ่าย (Fixed Cost)</span>
             </button>
             <button onclick="switchTab('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-left font-medium text-slate-300 hover:bg-slate-800 hover:text-white">
-                <i data-lucide="settings" class="w-5 h-5"></i>
-                <span>ตั้งค่า & ส่งออก</span>
+                <i data-lucide="cloud-cog" class="w-5 h-5"></i>
+                <span>เชื่อมต่อระบบคลาวด์</span>
             </button>
         </nav>
 
         <div class="p-4 border-t border-slate-800 text-xs text-slate-400 text-center">
-            เวอร์ชันร้านอาหาร 2.0.0 &copy; 2026
+            ResAcc Cloud v1.2.0
         </div>
     </aside>
 
     <!-- Mobile Header -->
     <header class="md:hidden bg-slate-900 text-white p-4 flex justify-between items-center shrink-0">
         <div class="flex items-center gap-2">
-            <div class="bg-orange-500 p-1.5 rounded-lg text-slate-900">
-                <i data-lucide="chef-hat" class="w-5 h-5"></i>
+            <div class="bg-primary-500 p-1.5 rounded-lg text-white">
+                <i data-lucide="utensils" class="w-5 h-5"></i>
             </div>
-            <h1 class="text-base font-bold">ResAcc</h1>
+            <h1 class="text-base font-bold">ResAcc Cloud</h1>
         </div>
-        <span class="text-xs bg-slate-800 px-2.5 py-1 rounded-full text-orange-400 font-semibold">ร้านอาหาร</span>
+        <button onclick="syncWithCloud()" class="bg-emerald-600 hover:bg-emerald-700 text-white p-1.5 rounded-lg text-xs flex items-center gap-1">
+            <i data-lucide="rotate-cw" class="w-4 h-4" id="mobile-sync-icon"></i>
+            <span>ซิงค์</span>
+        </button>
     </header>
 
     <!-- Main Content Area -->
@@ -111,17 +114,24 @@
         <!-- Top bar (Desktop only) -->
         <header class="hidden md:flex justify-between items-center px-8 py-4 bg-white border-b border-slate-200 shrink-0">
             <div>
-                <h2 id="page-title" class="text-xl font-bold text-slate-800">แดชบอร์ดสรุปยอดร้านอาหาร</h2>
-                <p id="page-subtitle" class="text-xs text-slate-500">วิเคราะห์ยอดขาย ต้นทุนวัตถุดิบ และค่าใช้จ่ายคงที่ (Fixed Costs)</p>
+                <h2 id="page-title" class="text-xl font-bold text-slate-800">แดชบอร์ดวิเคราะห์การเงินร้าน</h2>
+                <p id="page-subtitle" class="text-xs text-slate-500">ภาพรวมสถานะ รายรับ-รายจ่าย และอัตราต้นทุนวัตถุดิบ</p>
             </div>
             <div class="flex items-center gap-4">
-                <div class="flex items-center gap-2 text-sm text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span>ระบบคลังพร้อมทำงาน</span>
+                <!-- Sync Status -->
+                <div id="sync-badge" class="flex items-center gap-2 text-sm text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg">
+                    <span class="w-2 h-2 rounded-full bg-slate-400" id="sync-indicator"></span>
+                    <span id="sync-text">โหมดออฟไลน์ (Local)</span>
                 </div>
-                <button onclick="openModal('transaction-modal')" class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-xl flex items-center gap-2 text-sm font-medium transition shadow-sm">
+                
+                <button onclick="syncWithCloud()" id="btn-sync-now" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl flex items-center gap-1.5 text-xs font-semibold transition shadow-sm">
+                    <i data-lucide="rotate-cw" class="w-3.5 h-3.5" id="sync-icon"></i>
+                    <span>ซิงค์ Sheets</span>
+                </button>
+
+                <button onclick="openModal('transaction-modal')" class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 text-sm font-medium transition shadow-sm">
                     <i data-lucide="plus-circle" class="w-4 h-4"></i>
-                    <span>เพิ่มรายรับ/รายจ่าย</span>
+                    <span>บันทึกรายรับ/จ่าย</span>
                 </button>
             </div>
         </header>
@@ -133,23 +143,12 @@
             <section id="tab-dashboard" class="space-y-6">
                 <!-- Stat Cards -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <!-- Balance -->
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-                        <div>
-                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">กำไรสุทธิเดือนนี้</span>
-                            <h3 class="text-2xl font-bold text-slate-900 mt-1" id="stat-balance">฿0.00</h3>
-                            <span class="text-xs text-slate-500 mt-2 block" id="stat-balance-desc">อัปเดตแบบเรียลไทม์</span>
-                        </div>
-                        <div class="bg-indigo-50 p-4 rounded-xl text-indigo-600">
-                            <i data-lucide="coins" class="w-6 h-6"></i>
-                        </div>
-                    </div>
                     <!-- Income -->
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
                         <div>
-                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">ยอดขายรวม</span>
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">รายรับทั้งหมด (ยอดขาย)</span>
                             <h3 class="text-2xl font-bold text-emerald-600 mt-1" id="stat-income">฿0.00</h3>
-                            <span class="text-xs text-emerald-600 mt-2 block" id="stat-income-desc">จากทุกช่องทาง</span>
+                            <span class="text-xs text-slate-500 mt-2 block" id="stat-income-desc">รวม Dine-in, Delivery, Catering</span>
                         </div>
                         <div class="bg-emerald-50 p-4 rounded-xl text-emerald-600">
                             <i data-lucide="trending-up" class="w-6 h-6"></i>
@@ -158,34 +157,45 @@
                     <!-- Expense -->
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
                         <div>
-                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">ค่าใช้จ่ายทั้งหมด</span>
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">รายจ่ายรวม</span>
                             <h3 class="text-2xl font-bold text-rose-600 mt-1" id="stat-expense">฿0.00</h3>
-                            <span class="text-xs text-rose-600 mt-2 block" id="stat-expense-desc">รวมฟิกคอส & วัตถุดิบ</span>
+                            <span class="text-xs text-slate-500 mt-2 block" id="stat-expense-desc">วัตถุดิบและค่าฟิกคอส</span>
                         </div>
                         <div class="bg-rose-50 p-4 rounded-xl text-rose-600">
                             <i data-lucide="trending-down" class="w-6 h-6"></i>
                         </div>
                     </div>
-                    <!-- Food Cost Percentage -->
+                    <!-- Food Cost % -->
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
                         <div>
                             <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">สัดส่วนต้นทุนวัตถุดิบ</span>
-                            <h3 class="text-2xl font-bold text-amber-600 mt-1" id="stat-foodcost-rate">0%</h3>
-                            <span class="text-xs text-slate-500 mt-2 block" id="stat-foodcost-desc">เป้าหมายที่ควรเป็น: 25-35%</span>
+                            <h3 class="text-2xl font-bold text-orange-600 mt-1" id="stat-foodcost-percent">0%</h3>
+                            <span class="text-xs text-slate-500 mt-2 block" id="stat-foodcost-desc">ควรควบคุมไม่ให้เกิน 35-40%</span>
                         </div>
-                        <div class="bg-amber-50 p-4 rounded-xl text-amber-600">
-                            <i data-lucide="percent" class="w-6 h-6"></i>
+                        <div class="bg-orange-50 p-4 rounded-xl text-orange-600">
+                            <i data-lucide="pie-chart" class="w-6 h-6"></i>
+                        </div>
+                    </div>
+                    <!-- Net Profit -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">กำไรสุทธิ (Net Profit)</span>
+                            <h3 class="text-2xl font-bold text-blue-600 mt-1" id="stat-profit">฿0.00</h3>
+                            <span class="text-xs text-slate-500 mt-2 block" id="stat-profit-desc">ยอดขายหักลบรายจ่ายทั้งหมด</span>
+                        </div>
+                        <div class="bg-blue-50 p-4 rounded-xl text-blue-600">
+                            <i data-lucide="coins" class="w-6 h-6"></i>
                         </div>
                     </div>
                 </div>
 
                 <!-- Charts Row -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Cash Flow Bar Chart -->
+                    <!-- Cash Flow Line Chart -->
                     <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                         <div class="flex justify-between items-center mb-4">
-                            <h4 class="font-bold text-slate-800 text-base">การเปรียบเทียบยอดขายกับรายจ่ายรายวัน</h4>
-                            <span class="text-xs text-slate-500">7 รายการล่าสุด</span>
+                            <h4 class="font-bold text-slate-800 text-base">แนวโน้มรายรับ-รายจ่ายร้าน</h4>
+                            <span class="text-xs text-slate-500">ย้อนหลัง 7 รายการล่าสุด</span>
                         </div>
                         <div class="h-64 relative">
                             <canvas id="flowChart"></canvas>
@@ -193,30 +203,30 @@
                     </div>
                     <!-- Expenses Breakdown Pie Chart -->
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
-                        <h4 class="font-bold text-slate-800 text-base mb-4">โครงสร้างต้นทุนร้านอาหาร</h4>
+                        <h4 class="font-bold text-slate-800 text-base mb-4">สัดส่วนค่าใช้จ่ายร้าน</h4>
                         <div class="flex-1 h-48 relative flex items-center justify-center">
                             <canvas id="categoryChart"></canvas>
                         </div>
                     </div>
                 </div>
 
-                <!-- Recent Transactions / Inventory Warning Summary -->
+                <!-- Recent Activities / Alert Stocks -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Recent Activities -->
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col h-[380px]">
                         <div class="flex justify-between items-center mb-4">
-                            <h4 class="font-bold text-slate-800 text-base">รายการเดินบัญชีล่าสุด</h4>
-                            <button onclick="switchTab('transactions')" class="text-xs text-orange-600 font-medium hover:underline">ดูทั้งหมด</button>
+                            <h4 class="font-bold text-slate-800 text-base">รายการบัญชีล่าสุด</h4>
+                            <button onclick="switchTab('transactions')" class="text-xs text-primary-600 font-medium hover:underline">ดูทั้งหมด</button>
                         </div>
                         <div class="flex-1 overflow-y-auto space-y-3" id="recent-transactions-list">
                             <!-- JS will populate -->
                         </div>
                     </div>
-                    <!-- Inventory Warning Status -->
+                    <!-- Inventory Warning List -->
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col h-[380px]">
                         <div class="flex justify-between items-center mb-4">
-                            <h4 class="font-bold text-slate-800 text-base">วัตถุดิบที่ต้องจัดซื้อเพิ่ม (ต่ำกว่าเกณฑ์)</h4>
-                            <button onclick="switchTab('inventory')" class="text-xs text-orange-600 font-medium hover:underline">จัดการคลังสินค้า</button>
+                            <h4 class="font-bold text-slate-800 text-base">วัตถุดิบคลังสินค้า (ใกล้หมด/ต้องสั่งเพิ่ม)</h4>
+                            <button onclick="switchTab('inventory')" class="text-xs text-primary-600 font-medium hover:underline">ดูสต็อกทั้งหมด</button>
                         </div>
                         <div class="flex-1 overflow-y-auto space-y-3" id="dashboard-stock-alerts">
                             <!-- JS will populate -->
@@ -231,27 +241,23 @@
                     <!-- Filters Toolbar -->
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                         <div class="flex flex-wrap items-center gap-3">
-                            <!-- Search -->
                             <div class="relative min-w-[240px]">
                                 <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-                                <input type="text" id="filter-search" oninput="renderTransactions()" placeholder="ค้นหาบิล หรือชื่อรายการ..." class="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                <input type="text" id="filter-search" oninput="renderTransactions()" placeholder="ค้นหาบันทึก หรือคำอธิบาย..." class="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500">
                             </div>
-                            <!-- Category Filter -->
-                            <select id="filter-category" onchange="renderTransactions()" class="border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500">
+                            <select id="filter-category" onchange="renderTransactions()" class="border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary-500">
                                 <option value="all">ทุกหมวดหมู่</option>
-                                <!-- JS will populate dynamic options -->
                             </select>
-                            <!-- Type Filter -->
-                            <select id="filter-type" onchange="renderTransactions()" class="border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500">
+                            <select id="filter-type" onchange="renderTransactions()" class="border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary-500">
                                 <option value="all">ทุกประเภท (รับ/จ่าย)</option>
                                 <option value="income">รายรับ (ยอดขาย)</option>
-                                <option value="expense">รายจ่าย (ต้นทุน/ฟิกคอส)</option>
+                                <option value="expense">รายจ่าย</option>
                             </select>
                         </div>
                         
-                        <button onclick="openModal('transaction-modal')" class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm font-medium transition shadow-sm">
+                        <button onclick="openModal('transaction-modal')" class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm font-medium transition shadow-sm">
                             <i data-lucide="plus" class="w-4 h-4"></i>
-                            <span>บันทึกบัญชี</span>
+                            <span>บันทึกรายการ</span>
                         </button>
                     </div>
 
@@ -274,7 +280,7 @@
                         </table>
                         <div id="no-transactions" class="hidden text-center py-12 text-slate-400">
                             <i data-lucide="inbox" class="w-12 h-12 mx-auto mb-3 opacity-60"></i>
-                            <p>ไม่พบรายการเดินบัญชีที่ค้นหา</p>
+                            <p>ไม่พบข้อมูลรายการบัญชีในตัวกรองนี้</p>
                         </div>
                     </div>
                 </div>
@@ -283,78 +289,129 @@
             <!-- TAB: INVENTORY -->
             <section id="tab-inventory" class="space-y-6 hidden">
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                         <div>
-                            <h4 class="font-bold text-slate-800 text-lg">คลังวัตถุดิบ & สินค้าคงคลัง</h4>
-                            <p class="text-xs text-slate-500">บริหารคลังสินค้า ต้นทุนวัตถุดิบต่อหน่วย และการแจ้งเตือนสต็อกเหลือน้อย</p>
+                            <h4 class="font-bold text-slate-800 text-lg">คลังและสต็อกวัตถุดิบอาหาร (Inventory)</h4>
+                            <p class="text-xs text-slate-500">จัดการวัตถุดิบนำเข้า บันทึกเพิ่มจำนวนสต็อก และตรวจเช็กยอดคงเหลือ</p>
                         </div>
-                        <div class="flex gap-2">
-                            <button onclick="openInventoryModal()" class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 text-sm font-medium transition shadow-sm">
-                                <i data-lucide="package-plus" class="w-4 h-4"></i>
-                                <span>เพิ่มวัตถุดิบใหม่</span>
-                            </button>
-                        </div>
+                        <button onclick="openModal('inventory-modal')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 text-sm font-medium transition shadow-sm">
+                            <i data-lucide="package-plus" class="w-4 h-4"></i>
+                            <span>เพิ่มรายการวัตถุดิบ</span>
+                        </button>
                     </div>
 
-                    <!-- Stock Items Grid -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="inventory-grid-container">
-                        <!-- JS will populate -->
+                    <!-- Inventory Table -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-200 text-slate-400 text-xs uppercase tracking-wider font-semibold">
+                                    <th class="pb-3 pl-4">รหัส</th>
+                                    <th class="pb-3">วัตถุดิบ</th>
+                                    <th class="pb-3">หมวดหมู่</th>
+                                    <th class="pb-3 text-center">คงเหลือปัจจุบัน</th>
+                                    <th class="pb-3 text-right">ราคาทุนต่อหน่วย</th>
+                                    <th class="pb-3 text-center">การกระทำ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-table-body" class="divide-y divide-slate-100 text-sm">
+                                <!-- JS will populate -->
+                            </tbody>
+                        </table>
+                        <div id="no-inventory" class="hidden text-center py-12 text-slate-400">
+                            <i data-lucide="package" class="w-12 h-12 mx-auto mb-3 opacity-60"></i>
+                            <p>ไม่มีรายการวัตถุดิบในคลังขณะนี้ กดปุ่มด้านบนเพื่อเพิ่มสินค้าเข้าสต็อก</p>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- TAB: BUDGETS (COST CONTROL) -->
+            <!-- TAB: BUDGETS -->
             <section id="tab-budgets" class="space-y-6 hidden">
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                     <div class="flex justify-between items-center mb-6">
                         <div>
-                            <h4 class="font-bold text-slate-800 text-lg">ควบคุมต้นทุนคงที่ & ค่าใช้จ่ายร้าน (Budget Control)</h4>
-                            <p class="text-xs text-slate-500">กำหนดขอบเขตงบประมานเพื่อป้องกันปัญหาต้นทุนร้านอาหารบานปลาย</p>
+                            <h4 class="font-bold text-slate-800 text-lg">ควบคุมรายจ่ายคงที่และงบประมาณร้าน (Fixed Costs)</h4>
+                            <p class="text-xs text-slate-500">กำหนดเป้าหมายค่าใช้จ่ายคงที่ เช่น ค่าเช่า, เงินเดือนพนักงาน, ค่าน้ำไฟแก๊ส เพื่อไม่ให้ยอดใช้จ่ายบานปลาย</p>
                         </div>
-                        <button onclick="openBudgetModal()" class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 text-sm font-medium transition shadow-sm">
+                        <button onclick="openBudgetModal()" class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 text-sm font-medium transition shadow-sm">
                             <i data-lucide="sliders" class="w-4 h-4"></i>
-                            <span>ตั้งเพดานงบรายเดือน</span>
+                            <span>กำหนดงบประมาณ</span>
                         </button>
                     </div>
 
+                    <!-- Budgets Grid -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="budgets-grid-container">
                         <!-- JS will populate -->
                     </div>
                 </div>
             </section>
 
-            <!-- TAB: SETTINGS -->
+            <!-- TAB: SETTINGS & CLOUD CONNECTION -->
             <section id="tab-settings" class="space-y-6 hidden">
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
                     <div>
-                        <h4 class="font-bold text-slate-800 text-lg">ระบบสำรองข้อมูล & บริการฐานข้อมูล</h4>
-                        <p class="text-xs text-slate-500">ดาวน์โหลดประวัติบัญชีและสต็อกไปเก็บไว้ หรืออัปโหลดไฟล์สำรองข้อมูลร้านอาหารของคุณ</p>
+                        <h4 class="font-bold text-slate-800 text-lg">เชื่อมต่อระบบคลาวด์ & สำรองฐานข้อมูล</h4>
+                        <p class="text-xs text-slate-500">ผูกเชื่อมโยงข้อมูลหน้าเว็บเข้ากับ Google Sheets และ Google Apps Script</p>
+                    </div>
+
+                    <hr class="border-slate-100">
+
+                    <!-- Cloud Connection Setting (FIXED / ADDED FUNCTION) -->
+                    <div class="border border-emerald-100 rounded-2xl p-6 bg-emerald-50/30 space-y-4">
+                        <div class="bg-emerald-500 text-white p-3 rounded-xl w-fit">
+                            <i data-lucide="cloud" class="w-6 h-6"></i>
+                        </div>
+                        <h5 class="font-bold text-slate-800 text-base">การตั้งค่า Google Sheets (Cloud API Connection)</h5>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            ป้อนลิงก์ <strong>Web App URL</strong> ที่คุณสร้างขึ้นมาจาก Google Apps Script เพื่อเปิดใช้งานฟังก์ชันการซิงก์ข้อมูลอัจฉริยะร่วมกับ LINE Bot, สแกน Gmail และ Google Sheets คลาวด์อัตโนมัติ
+                        </p>
+                        <div class="space-y-3">
+                            <label for="cloud-url" class="block text-xs font-bold text-slate-500 uppercase">ลิงก์เว็บแอป (Web App URL)</label>
+                            <input type="url" id="cloud-url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 font-mono">
+                            
+                            <div class="flex flex-wrap gap-2 pt-2">
+                                <button onclick="saveCloudSettings()" class="bg-primary-600 hover:bg-primary-700 text-white px-5 py-2.5 rounded-xl text-xs font-semibold transition shadow-sm inline-flex items-center gap-1.5">
+                                    <i data-lucide="save" class="w-4 h-4"></i>
+                                    <span>บันทึกการตั้งค่าคลาวด์</span>
+                                </button>
+                                <button onclick="testConnection()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-5 py-2.5 rounded-xl text-xs font-semibold transition inline-flex items-center gap-1.5">
+                                    <i data-lucide="activity" class="w-4 h-4"></i>
+                                    <span>ทดสอบเชื่อมต่อชีต</span>
+                                </button>
+                                <button onclick="clearCloudSettings()" class="border border-rose-200 text-rose-600 hover:bg-rose-50 px-5 py-2.5 rounded-xl text-xs font-semibold transition inline-flex items-center gap-1.5">
+                                    <i data-lucide="cloud-off" class="w-4 h-4"></i>
+                                    <span>ยกเลิกการเชื่อมคลาวด์</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <hr class="border-slate-100">
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Export card -->
                         <div class="border border-slate-200 rounded-2xl p-6 bg-slate-50 space-y-4">
                             <div class="bg-indigo-50 text-indigo-600 p-3 rounded-xl w-fit">
                                 <i data-lucide="download" class="w-6 h-6"></i>
                             </div>
-                            <h5 class="font-bold text-slate-800 text-base">ส่งออกข้อมูลรวม (Export Backup JSON)</h5>
-                            <p class="text-xs text-slate-500 leading-relaxed">ดาวน์โหลดประวัติธุรกรรม สต็อกสินค้าคงเหลือ และข้อมูลฟิกคอสทั้งหมดเก็บไว้เพื่อความปลอดภัยของข้อมูลการเงินร้านคุณ</p>
+                            <h5 class="font-bold text-slate-800 text-base">ส่งออกข้อมูลบัญชีออฟไลน์ (Export JSON)</h5>
+                            <p class="text-xs text-slate-500 leading-relaxed">ดาวน์โหลดข้อมูลการทำงานปัจจุบันทั้งหมดลงเครื่องคอมพิวเตอร์ของคุณเพื่อเก็บเป็นไฟล์สำรองข้อมูลส่วนบุคคลได้ทันที</p>
                             <button onclick="exportData()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition shadow-sm inline-flex items-center gap-2">
                                 <i data-lucide="download" class="w-4 h-4"></i>
-                                <span>ดาวน์โหลดไฟล์สำรอง</span>
+                                <span>ดาวน์โหลดไฟล์ข้อมูล</span>
                             </button>
                         </div>
 
+                        <!-- Import card -->
                         <div class="border border-slate-200 rounded-2xl p-6 bg-slate-50 space-y-4">
-                            <div class="bg-emerald-50 text-emerald-600 p-3 rounded-xl w-fit">
+                            <div class="bg-orange-50 text-orange-600 p-3 rounded-xl w-fit">
                                 <i data-lucide="upload" class="w-6 h-6"></i>
                             </div>
-                            <h5 class="font-bold text-slate-800 text-base">นำเข้าข้อมูลร้านค้า (Import Backup JSON)</h5>
-                            <p class="text-xs text-slate-500 leading-relaxed">เลือกไฟล์บันทึกสำรองของคุณเพื่อดึงรายงานบัญชีเดิมกลับมา การบันทึกนี้จะทับข้อมูลร้านในระบบปัจจุบันทันที</p>
-                            <label class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition shadow-sm inline-flex items-center gap-2 cursor-pointer w-fit">
+                            <h5 class="font-bold text-slate-800 text-base">นำเข้าข้อมูลสำรอง (Import JSON)</h5>
+                            <p class="text-xs text-slate-500 leading-relaxed">เลือกไฟล์ข้อมูลที่เคยบันทึกไว้เพื่ออัปโหลดกลับเข้ามาเขียนทับและบันทึกทดแทนประวัติการเงินร้านในระบบปัจจุบัน</p>
+                            <label class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition shadow-sm inline-flex items-center gap-2 cursor-pointer w-fit">
                                 <i data-lucide="upload" class="w-4 h-4"></i>
-                                <span>เปิดไฟล์และกู้คืนข้อมูล</span>
+                                <span>อัปโหลดและเขียนทับ</span>
                                 <input type="file" id="import-file-input" onchange="importData(event)" class="hidden" accept=".json">
                             </label>
                         </div>
@@ -362,13 +419,14 @@
 
                     <hr class="border-slate-100">
 
+                    <!-- Wipe Data Section -->
                     <div class="p-6 border border-rose-100 rounded-2xl bg-rose-50/50 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div class="space-y-1">
-                            <h5 class="font-bold text-rose-800 text-base">ล้างประวัติร้านอาหารทั้งหมด (Reset Data)</h5>
-                            <p class="text-xs text-rose-600">การกระทำนี้จะล้างประวัติยอดขาย รายจ่ายทั้งหมดรวมถึงสต็อกวัตถุดิบคืนสู่ค่าเริ่มต้น</p>
+                            <h5 class="font-bold text-rose-800 text-base">รีเซ็ตลบข้อมูลร้านค้าทั้งหมด (Wipe Data)</h5>
+                            <p class="text-xs text-rose-600">การดำเนินการนี้จะลบรายการบัญชี งบประมาณรายจ่ายคงที่ และสต็อกทั้งหมดออกจากบราวเซอร์ทันที</p>
                         </div>
                         <button onclick="wipeAllData()" class="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm">
-                            ล้างข้อมูลร้านทั้งหมด
+                            ล้างข้อมูลในเครื่อง
                         </button>
                     </div>
                 </div>
@@ -378,9 +436,9 @@
 
         <!-- Mobile Bottom Nav -->
         <nav class="md:hidden bg-slate-950 text-slate-400 flex justify-around p-3 border-t border-slate-800 shrink-0">
-            <button onclick="switchTab('dashboard')" id="mob-dashboard" class="flex flex-col items-center gap-1 text-orange-500">
+            <button onclick="switchTab('dashboard')" id="mob-dashboard" class="flex flex-col items-center gap-1 text-primary-500">
                 <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                <span class="text-[10px]">วิเคราะห์</span>
+                <span class="text-[10px]">แดชบอร์ด</span>
             </button>
             <button onclick="switchTab('transactions')" id="mob-transactions" class="flex flex-col items-center gap-1">
                 <i data-lucide="receipt-text" class="w-5 h-5"></i>
@@ -388,15 +446,15 @@
             </button>
             <button onclick="switchTab('inventory')" id="mob-inventory" class="flex flex-col items-center gap-1">
                 <i data-lucide="boxes" class="w-5 h-5"></i>
-                <span class="text-[10px]">สต็อกวัตถุดิบ</span>
+                <span class="text-[10px]">คลังวัตถุดิบ</span>
             </button>
             <button onclick="switchTab('budgets')" id="mob-budgets" class="flex flex-col items-center gap-1">
-                <i data-lucide="landmark" class="w-5 h-5"></i>
-                <span class="text-[10px]">คุมต้นทุน</span>
+                <i data-lucide="sliders" class="w-5 h-5"></i>
+                <span class="text-[10px]">งบค่าใช้จ่าย</span>
             </button>
             <button onclick="switchTab('settings')" id="mob-settings" class="flex flex-col items-center gap-1">
-                <i data-lucide="settings" class="w-5 h-5"></i>
-                <span class="text-[10px]">ตั้งค่า</span>
+                <i data-lucide="cloud-cog" class="w-5 h-5"></i>
+                <span class="text-[10px]">คลาวด์</span>
             </button>
         </nav>
     </main>
@@ -404,24 +462,22 @@
     <!-- MODAL: TRANSACTION CREATOR/EDITOR -->
     <div id="transaction-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
-            <!-- Header -->
             <div class="bg-slate-900 text-white p-5 flex justify-between items-center">
                 <div class="flex items-center gap-2">
-                    <i data-lucide="receipt" class="w-5 h-5 text-orange-500"></i>
-                    <h3 class="font-bold text-base" id="modal-title">บันทึกรายการบัญชีใหม่</h3>
+                    <i data-lucide="receipt" class="w-5 h-5 text-primary-500"></i>
+                    <h3 class="font-bold text-base" id="modal-title">เพิ่มรายการรายรับ-รายจ่ายร้านอาหาร</h3>
                 </div>
                 <button onclick="closeModal('transaction-modal')" class="text-slate-400 hover:text-white transition">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
             
-            <!-- Body Form -->
             <form id="transaction-form" onsubmit="saveTransaction(event)" class="p-6 space-y-4 overflow-y-auto flex-1">
                 <input type="hidden" id="trans-id">
                 
                 <!-- Type Selection -->
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">ประเภทรายการ</label>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">ประเภทธุรกรรม</label>
                     <div class="grid grid-cols-2 gap-3">
                         <label class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-slate-200 cursor-pointer bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium transition [&:has(:checked)]:border-emerald-500 [&:has(:checked)]:bg-emerald-50 [&:has(:checked)]:text-emerald-700">
                             <input type="radio" name="trans-type" value="income" checked onclick="toggleFormType('income')" class="sr-only">
@@ -431,7 +487,7 @@
                         <label class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-slate-200 cursor-pointer bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium transition [&:has(:checked)]:border-rose-500 [&:has(:checked)]:bg-rose-50 [&:has(:checked)]:text-rose-700">
                             <input type="radio" name="trans-type" value="expense" onclick="toggleFormType('expense')" class="sr-only">
                             <i data-lucide="trending-down" class="w-4 h-4"></i>
-                            <span>รายจ่าย (ต้นทุนร้าน)</span>
+                            <span>รายจ่าย (ค่าใช้จ่าย)</span>
                         </label>
                     </div>
                 </div>
@@ -439,12 +495,12 @@
                 <!-- Title & Amount -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div class="sm:col-span-2">
-                        <label for="trans-title" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">ชื่อรายการ / คำอธิบาย</label>
-                        <input type="text" id="trans-title" required placeholder="เช่น ยอดขายวันเสาร์, ซื้อไข่ไก่หน้าร้าน" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        <label for="trans-title" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">รายการอาหาร / ชำระสินค้า / รายจ่าย</label>
+                        <input type="text" id="trans-title" required placeholder="เช่น ยอดขายอาหารเที่ยง, สั่งซื้อเนื้อหมู 20 กก." class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500">
                     </div>
                     <div>
                         <label for="trans-amount" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">จำนวนเงิน (฿)</label>
-                        <input type="number" step="0.01" id="trans-amount" required placeholder="0.00" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        <input type="number" step="0.01" id="trans-amount" required placeholder="0.00" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary-500">
                     </div>
                 </div>
 
@@ -452,11 +508,11 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label for="trans-date" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">วันที่ทำรายการ</label>
-                        <input type="date" id="trans-date" required class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        <input type="date" id="trans-date" required class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500">
                     </div>
                     <div>
                         <label for="trans-category" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">หมวดหมู่</label>
-                        <select id="trans-category" required class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        <select id="trans-category" required class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary-500">
                             <!-- Dynamic Categories -->
                         </select>
                     </div>
@@ -464,18 +520,17 @@
 
                 <!-- Notes -->
                 <div>
-                    <label for="trans-notes" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">หมายเหตุ / แหล่งชำระเงิน</label>
-                    <textarea id="trans-notes" rows="2" placeholder="เช่น เงินโอนเข้ากสิกร, จ่ายเงินสดเด็กส่งของ" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"></textarea>
+                    <label for="trans-notes" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">บันทึกเพิ่มเติม (ถ้ามี)</label>
+                    <textarea id="trans-notes" rows="2" placeholder="เช่น บันทึกรายรับจากเครื่อง POS 1, สั่งซื้อจากแมคโคร" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"></textarea>
                 </div>
 
-                <!-- Footer buttons inside Form -->
                 <div class="pt-4 border-t border-slate-100 flex justify-end gap-3">
                     <button type="button" onclick="closeModal('transaction-modal')" class="px-4 py-2.5 border border-slate-200 hover:bg-slate-50 rounded-xl text-sm font-medium text-slate-600 transition">
                         ยกเลิก
                     </button>
-                    <button type="submit" class="px-5 py-2.5 bg-orange-600 hover:bg-orange-700 text-white rounded-xl text-sm font-medium transition shadow-sm flex items-center gap-1">
+                    <button type="submit" class="px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-xl text-sm font-medium transition shadow-sm flex items-center gap-1">
                         <i data-lucide="check" class="w-4 h-4"></i>
-                        <span>บันทึกข้อมูล</span>
+                        <span>บันทึกธุรกรรม</span>
                     </button>
                 </div>
             </form>
@@ -487,8 +542,8 @@
         <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden">
             <div class="bg-slate-900 text-white p-5 flex justify-between items-center">
                 <div class="flex items-center gap-2">
-                    <i data-lucide="boxes" class="w-5 h-5 text-orange-500"></i>
-                    <h3 id="inv-modal-title" class="font-bold text-base">เพิ่มสต็อกวัตถุดิบ</h3>
+                    <i data-lucide="boxes" class="w-5 h-5 text-emerald-500"></i>
+                    <h3 class="font-bold text-base" id="inventory-modal-title">เพิ่มรายการวัตถุดิบอาหาร</h3>
                 </div>
                 <button onclick="closeModal('inventory-modal')" class="text-slate-400 hover:text-white transition">
                     <i data-lucide="x" class="w-5 h-5"></i>
@@ -499,66 +554,56 @@
                 <input type="hidden" id="inv-item-id">
                 
                 <div>
-                    <label for="inv-item-name" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">ชื่อวัตถุดิบ / สินค้า</label>
-                    <input type="text" id="inv-item-name" required placeholder="เช่น ไข่ไก่ เบอร์ 2, หมูสามชั้นสไลด์" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    <label for="inv-item-name" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">ชื่อวัตถุดิบ (Ingredient Name)</label>
+                    <input type="text" id="inv-item-name" required placeholder="เช่น อกไก่สด, ไข่ไก่ เบอร์ 2, น้ำมันพืช" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500">
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label for="inv-item-type" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">หมวดหมู่</label>
-                        <select id="inv-item-type" required class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500">
-                            <option value="meat">เนื้อสัตว์ / อาหารทะเล</option>
-                            <option value="veg">ผักสด / ผลไม้</option>
-                            <option value="dry">ของแห้ง / เครื่องปรุง</option>
-                            <option value="drink">เครื่องดื่ม</option>
-                            <option value="pack">บรรจุภัณฑ์ / ของใช้</option>
+                        <label for="inv-item-category" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">ประเภทวัตถุดิบ</label>
+                        <select id="inv-item-category" required class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary-500">
+                            <option value="raw-meat">เนื้อสัตว์และอาหารทะเล</option>
+                            <option value="vegetables">ผักสดและผลไม้</option>
+                            <option value="dry-goods">ของแห้งและเครื่องปรุง</option>
+                            <option value="beverages">น้ำแข็งและเครื่องดื่ม</option>
                         </select>
                     </div>
                     <div>
                         <label for="inv-item-unit" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">หน่วยนับ</label>
-                        <input type="text" id="inv-item-unit" required placeholder="กิโลกรัม, แผง, ลัง" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        <input type="text" id="inv-item-unit" required placeholder="เช่น กก., แผง, ขวด, ลิตร" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500">
                     </div>
                 </div>
 
-                <div class="grid grid-cols-3 gap-2">
+                <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label for="inv-item-qty" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">จำนวนคงเหลือ</label>
-                        <input type="number" step="0.01" id="inv-item-qty" required placeholder="0" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        <label for="inv-item-qty" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">จำนวนที่มีอยู่ปัจจุบัน</label>
+                        <input type="number" step="0.01" id="inv-item-qty" required placeholder="0.00" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500">
                     </div>
                     <div>
-                        <label for="inv-item-cost" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">ราคาทุนต่อหน่วย</label>
-                        <input type="number" step="0.01" id="inv-item-cost" required placeholder="0" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        <label for="inv-item-cost" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">ราคาทุนต่อหน่วย (฿)</label>
+                        <input type="number" step="0.01" id="inv-item-cost" required placeholder="เช่น 120" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500">
                     </div>
-                    <div>
-                        <label for="inv-item-min" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">เกณฑ์ขั้นต่ำเตือน</label>
-                        <input type="number" step="0.01" id="inv-item-min" required placeholder="0" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-2 p-3 bg-orange-50 border border-orange-100 rounded-xl text-orange-800 text-xs">
-                    <i data-lucide="info" class="w-4 h-4 shrink-0"></i>
-                    <span>เมื่อมีการบันทึก/อัปเดตปริมาณสต็อกเพิ่มขึ้น ระบบจะสร้างประวัติรายจ่ายวัตถุดิบให้อัตโนมัติ</span>
                 </div>
 
                 <div class="pt-4 border-t border-slate-100 flex justify-end gap-3">
                     <button type="button" onclick="closeModal('inventory-modal')" class="px-4 py-2 border border-slate-200 hover:bg-slate-50 rounded-xl text-sm font-medium text-slate-600 transition">
                         ยกเลิก
                     </button>
-                    <button type="submit" class="px-5 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-xl text-sm font-medium transition shadow-sm">
-                        บันทึกสต็อก
+                    <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-medium transition shadow-sm">
+                        บันทึกวัตถุดิบ
                     </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL: BUDGET LIMITS -->
+    <!-- MODAL: BUDGET SETTING -->
     <div id="budget-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden">
             <div class="bg-slate-900 text-white p-5 flex justify-between items-center">
                 <div class="flex items-center gap-2">
-                    <i data-lucide="sliders" class="w-5 h-5 text-orange-500"></i>
-                    <h3 class="font-bold text-base">กำหนดงบควบคุมค่าใช้จ่าย</h3>
+                    <i data-lucide="sliders" class="w-5 h-5 text-primary-500"></i>
+                    <h3 class="font-bold text-base">กำหนดงบรายจ่ายคงที่ร้าน</h3>
                 </div>
                 <button onclick="closeModal('budget-modal')" class="text-slate-400 hover:text-white transition">
                     <i data-lucide="x" class="w-5 h-5"></i>
@@ -567,22 +612,22 @@
             
             <form onsubmit="saveBudget(event)" class="p-6 space-y-4">
                 <div>
-                    <label for="budget-category" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">หมวดหมู่ค่าใช้จ่าย / ต้นทุน</label>
-                    <select id="budget-category" required class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500">
-                        <!-- Dynamic expense categories populate -->
+                    <label for="budget-category" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">เลือกหมวดหมู่รายจ่ายที่จำกัด</label>
+                    <select id="budget-category" required class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary-500">
+                        <!-- Filled in via JS -->
                     </select>
                 </div>
                 <div>
-                    <label for="budget-limit" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">เพดานงบประมาณจำกัดรายเดือน (฿)</label>
-                    <input type="number" step="100" id="budget-limit" required placeholder="เช่น 20000" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    <label for="budget-limit" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">งบประมาณจำกัดรายเดือน (฿)</label>
+                    <input type="number" step="100" id="budget-limit" required placeholder="เช่น 25000" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary-500">
                 </div>
 
                 <div class="pt-4 border-t border-slate-100 flex justify-end gap-3">
                     <button type="button" onclick="closeModal('budget-modal')" class="px-4 py-2 border border-slate-200 hover:bg-slate-50 rounded-xl text-sm font-medium text-slate-600 transition">
                         ยกเลิก
                     </button>
-                    <button type="submit" class="px-5 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-xl text-sm font-medium transition shadow-sm">
-                        ตั้งเป้าหมาย
+                    <button type="submit" class="px-5 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl text-sm font-medium transition shadow-sm">
+                        ตั้งค่าเป้าหมาย
                     </button>
                 </div>
             </form>
@@ -597,78 +642,88 @@
         <p id="toast-message" class="text-sm font-medium text-slate-200"></p>
     </div>
 
-    <!-- APPLICATION LOGIC (State & Core Functions) -->
+    <!-- APPLICATION LOGIC -->
     <script>
-        // --- 1. Global State Management & Restaurant Customized Mock Data ---
+        // --- 1. Global State Management & Mocks ---
         let state = {
             transactions: [],
+            inventory: [],
             budgets: {},
-            inventory: []
+            cloudUrl: "" // Google Apps Script URL
         };
 
         const defaultCategories = {
             income: [
-                { id: 'dine-in', name: 'ยอดขายหน้าร้าน (Dine-In)', color: 'bg-emerald-100 text-emerald-800 border-emerald-200', text: '#15803d', icon: 'store' },
-                { id: 'delivery', name: 'ยอดขายเดลิเวอรี (Delivery)', color: 'bg-teal-100 text-teal-800 border-teal-200', text: '#0f766e', icon: 'bike' },
-                { id: 'catering', name: 'รับจัดเลี้ยงนอกสถานที่ (Catering)', color: 'bg-sky-100 text-sky-800 border-sky-200', text: '#0369a1', icon: 'utensils-cross' },
-                { id: 'other-inc', name: 'รายรับอื่นๆ ของร้าน', color: 'bg-slate-100 text-slate-800 border-slate-200', text: '#475569', icon: 'plus-circle' }
+                { id: 'dine-in', name: 'ขายหน้าร้าน (Dine-in)', color: 'bg-emerald-100 text-emerald-800 border-emerald-200', text: '#15803d', icon: 'store' },
+                { id: 'delivery', name: 'เดลิเวอรี (Delivery)', color: 'bg-teal-100 text-teal-800 border-teal-200', text: '#0f766e', icon: 'bike' },
+                { id: 'catering', name: 'งานจัดเลี้ยง (Catering)', color: 'bg-indigo-100 text-indigo-800 border-indigo-200', text: '#4338ca', icon: 'soup' },
+                { id: 'other-inc', name: 'รายรับอื่นๆ', color: 'bg-slate-100 text-slate-800 border-slate-200', text: '#475569', icon: 'plus-circle' }
             ],
             expense: [
-                { id: 'raw-mat', name: 'ต้นทุนวัตถุดิบ & ของสด (COGS)', color: 'bg-amber-100 text-amber-800 border-amber-200', text: '#b45309', icon: 'beef' },
-                { id: 'fixed-rent', name: 'ค่าเช่าร้าน/สถานที่ (Fixed)', color: 'bg-purple-100 text-purple-800 border-purple-200', text: '#7e22ce', icon: 'home' },
-                { id: 'fixed-staff', name: 'ค่าจ้างพนักงาน/เงินเดือน (Fixed)', color: 'bg-blue-100 text-blue-800 border-blue-200', text: '#1d4ed8', icon: 'users' },
-                { id: 'utilities', name: 'น้ำ ไฟ แก๊สหุงต้ม คีย์การ์ด', color: 'bg-cyan-100 text-cyan-800 border-cyan-200', text: '#0e7490', icon: 'zap' },
-                { id: 'marketing', name: 'ค่าโฆษณา/คอมมิชชั่น GP', color: 'bg-pink-100 text-pink-800 border-pink-200', text: '#be185d', icon: 'megaphone' },
-                { id: 'equipment', name: 'อุปกรณ์ครัว/เครื่องแก้วจานชาม', color: 'bg-rose-100 text-rose-800 border-rose-200', text: '#be123c', icon: 'soup' },
-                { id: 'other-exp', name: 'เบ็ดเตล็ดอื่นๆ รายวัน', color: 'bg-slate-100 text-slate-800 border-slate-200', text: '#475569', icon: 'minus-circle' }
+                { id: 'raw-mat', name: 'จัดซื้อวัตถุดิบอาหาร', color: 'bg-orange-100 text-orange-800 border-orange-200', text: '#ea580c', icon: 'shopping-bag' },
+                { id: 'fixed-rent', name: 'ค่าเช่าร้านคงที่', color: 'bg-rose-100 text-rose-800 border-rose-200', text: '#be123c', icon: 'home' },
+                { id: 'fixed-salary', name: 'เงินเดือน/ค่าจ้างพนักงาน', color: 'bg-blue-100 text-blue-800 border-blue-200', text: '#1d4ed8', icon: 'users' },
+                { id: 'utilities', name: 'ค่าน้ำ ไฟ แก๊สหุงต้ม', color: 'bg-cyan-100 text-cyan-800 border-cyan-200', text: '#0e7490', icon: 'zap' },
+                { id: 'marketing', name: 'ค่าโฆษณาและการตลาด', color: 'bg-pink-100 text-pink-800 border-pink-200', text: '#be185d', icon: 'megaphone' },
+                { id: 'other-exp', name: 'ค่าจิปาถะอื่นๆ', color: 'bg-slate-100 text-slate-800 border-slate-200', text: '#475569', icon: 'minus-circle' }
             ]
         };
 
         const mockTransactions = [
-            { id: 't1', type: 'income', title: 'ยอดขายบิลหน้าร้านประจำสัปดาห์', amount: 48500, date: '2026-05-25', category: 'dine-in', notes: 'รวมบิลเสาร์-อาทิตย์' },
-            { id: 't2', type: 'income', title: 'ยอดสั่งโอน Lineman/Grab', amount: 14200, date: '2026-05-26', category: 'delivery', notes: 'หัก GP เรียบร้อย' },
-            { id: 't3', type: 'expense', title: 'ค่าเช่าอาคารสาขาแรก', amount: 25000, date: '2026-05-01', category: 'fixed-rent', notes: 'จ่ายทุกต้นเดือน' },
-            { id: 't4', type: 'expense', title: 'เงินเดือนกุ๊กและพนักงานเสิร์ฟ', amount: 32000, date: '2026-05-27', category: 'fixed-staff', notes: 'ประจำรอบสิ้นเดือน' },
-            { id: 't5', type: 'expense', title: 'บิลค่าไฟฟ้าและแก๊สหุงต้ม', amount: 8400, date: '2026-05-24', category: 'utilities', notes: 'แก็ส ปตท 4 ถัง' },
-            { id: 't6', type: 'expense', title: 'วัตถุดิบสั่งซื้อพิเศษ: เนื้อริบอายพรีเมียม', amount: 4500, date: '2026-05-26', category: 'raw-mat', notes: 'นำเข้าออสเตรเลีย' }
+            { id: 't1', type: 'income', title: 'ยอดขายหน้าร้าน พฤหัสบดี', amount: 18500, date: '2026-05-28', category: 'dine-in', notes: 'ปิดยอดเครื่อง POS' },
+            { id: 't2', type: 'income', title: 'ยอดโอนเดลิเวอรี LINEMAN', amount: 4800, date: '2026-05-28', category: 'delivery', notes: 'หัก GP 30% แล้ว' },
+            { id: 't3', type: 'expense', title: 'สั่งผักสดจากตลาดยิ่งเจริญ', amount: 1450, date: '2026-05-28', category: 'raw-mat', notes: 'ชำระเงินสด' },
+            { id: 't4', type: 'expense', title: 'สั่งซื้อหมูสามชั้น 10kg', amount: 1600, date: '2026-05-27', category: 'raw-mat', notes: 'เติมของในตู้ฟรีซ' },
+            { id: 't5', type: 'expense', title: 'จ่ายค่าเช่าร้าน ล่วงหน้า', amount: 20000, date: '2026-05-25', category: 'fixed-rent', notes: 'โอนผ่านบัญชีบริษัท' },
+            { id: 't6', type: 'expense', title: 'จ่ายค่าไฟฟ้าร้าน รอบ พ.ค.', amount: 4890, date: '2026-05-24', category: 'utilities', notes: 'โอนชำระด่วน' }
         ];
 
         const mockInventory = [
-            { id: 'i1', name: 'เนื้อหมูสันนอกเกรด A', category: 'meat', quantity: 24, unit: 'กิโลกรัม', minQuantity: 10, costPerUnit: 145 },
-            { id: 'i2', name: 'ข้าวหอมมะลิคัดพิเศษ', category: 'dry', quantity: 4, unit: 'กระสอบ (5kg)', minQuantity: 6, costPerUnit: 185 },
-            { id: 'i3', name: 'น้ำมันพืชตรากุ๊ก', category: 'dry', quantity: 18, unit: 'ขวด (1L)', minQuantity: 5, costPerUnit: 46 },
-            { id: 'i4', name: 'มะเขือเทศราชินีสด', category: 'veg', quantity: 2, unit: 'กิโลกรัม', minQuantity: 5, costPerUnit: 60 },
-            { id: 'i5', name: 'เบียร์ช้าง (Chang Beer)', category: 'drink', quantity: 8, unit: 'ลัง', minQuantity: 3, costPerUnit: 680 }
+            { id: 'inv1', name: 'เนื้อหมูสามชั้นสด', category: 'raw-meat', quantity: 15.5, unit: 'กก.', costPerUnit: 160 },
+            { id: 'inv2', name: 'ผักกาดขาว', category: 'vegetables', quantity: 5.2, unit: 'กก.', costPerUnit: 40 },
+            { id: 'inv3', name: 'ไข่ไก่ เบอร์ 2', category: 'dry-goods', quantity: 2, unit: 'แผง', costPerUnit: 125 },
+            { id: 'inv4', name: 'แก๊ส LPG ถังใหญ่', category: 'dry-goods', quantity: 1, unit: 'ถัง', costPerUnit: 450 },
+            { id: 'inv5', name: 'เบียร์ช้างขวด', category: 'beverages', quantity: 12, unit: 'ขวด', costPerUnit: 58 }
         ];
 
         const defaultBudgets = {
-            'raw-mat': 60000,
-            'fixed-rent': 25000,
-            'fixed-staff': 45000,
-            'utilities': 12000
+            'raw-mat': 35000,
+            'fixed-salary': 25000,
+            'utilities': 8000
         };
 
+        // Chart instances
         let flowChartInstance = null;
         let categoryChartInstance = null;
 
-        // --- 2. Application Setup on Load ---
+        // --- 2. Initial Setup ---
         window.onload = function() {
-            const stored = localStorage.getItem('resacc_state_v2');
+            // Load state from LocalStorage
+            const stored = localStorage.getItem('resacc_state_v1');
             if (stored) {
                 try {
                     state = JSON.parse(stored);
                 } catch(e) {
-                    console.error("Error parsing stored data. Loading defaults.");
+                    console.error("Error loading localStorage. Defaulting.");
                     loadDefaults();
                 }
             } else {
                 loadDefaults();
             }
 
+            // Sync with Cloud Automatically if configuration exists
+            if (state.cloudUrl) {
+                document.getElementById('cloud-url').value = state.cloudUrl;
+                updateSyncUI(true);
+                syncWithCloud(); // Auto sync
+            } else {
+                updateSyncUI(false);
+            }
+
             populateFormCategories();
             populateFilterOptions();
-            
             document.getElementById('trans-date').value = new Date().toISOString().split('T')[0];
+
             switchTab('dashboard');
         };
 
@@ -676,43 +731,198 @@
             state.transactions = [...mockTransactions];
             state.inventory = [...mockInventory];
             state.budgets = {...defaultBudgets};
+            state.cloudUrl = "";
             saveStateToStorage();
         }
 
         function saveStateToStorage() {
-            localStorage.setItem('resacc_state_v2', JSON.stringify(state));
+            localStorage.setItem('resacc_state_v1', JSON.stringify(state));
         }
 
-        // --- 3. UI Helpers ---
+        // --- 3. Cloud Integration Sync Core (CRITICAL IMPLEMENTATION) ---
+        function updateSyncUI(isConnected, isSyncing = false) {
+            const badge = document.getElementById('sync-badge');
+            const indicator = document.getElementById('sync-indicator');
+            const text = document.getElementById('sync-text');
+            const syncBtn = document.getElementById('btn-sync-now');
+            
+            const syncIcon = document.getElementById('sync-icon');
+            const mobSyncIcon = document.getElementById('mobile-sync-icon');
+
+            if (isSyncing) {
+                indicator.className = "w-2 h-2 rounded-full bg-amber-500 animate-bounce";
+                text.innerText = "กำลังซิงค์คลาวด์...";
+                if (syncIcon) syncIcon.classList.add('animate-spin');
+                if (mobSyncIcon) mobSyncIcon.classList.add('animate-spin');
+                return;
+            } else {
+                if (syncIcon) syncIcon.classList.remove('animate-spin');
+                if (mobSyncIcon) mobSyncIcon.classList.remove('animate-spin');
+            }
+
+            if (isConnected) {
+                indicator.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+                text.innerText = "เชื่อมต่อระบบคลาวด์ (ซิงค์แล้ว)";
+                if (syncBtn) syncBtn.classList.remove('hidden');
+            } else {
+                indicator.className = "w-2 h-2 rounded-full bg-slate-400";
+                text.innerText = "โหมดออฟไลน์ (Local)";
+                if (syncBtn) syncBtn.classList.add('hidden');
+            }
+        }
+
+        async function syncWithCloud() {
+            if (!state.cloudUrl) {
+                showToast("ยังไม่ได้ระบุลิงก์ Cloud Web App URL โปรดตั้งค่าก่อนครับ", "error");
+                return;
+            }
+
+            updateSyncUI(true, true);
+
+            try {
+                // GET data from Apps Script doGet(e)
+                const response = await fetch(`${state.cloudUrl}?action=getData`, {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+
+                if (!response.ok) throw new Error("Network response error");
+
+                const cloudData = await response.json();
+                
+                if (cloudData.error) {
+                    showToast(cloudData.error, "error");
+                    updateSyncUI(true, false);
+                    return;
+                }
+
+                // If sheets data successfully returned, write to local state
+                if (cloudData.transactions && cloudData.transactions.length > 0) {
+                    state.transactions = cloudData.transactions;
+                }
+                if (cloudData.inventory && cloudData.inventory.length > 0) {
+                    state.inventory = cloudData.inventory;
+                }
+                if (cloudData.budgets) {
+                    state.budgets = cloudData.budgets;
+                }
+
+                saveStateToStorage();
+                showToast("ซิงค์ข้อมูลกับ Google Sheets สำเร็จเรียบร้อย!");
+                
+                // Redraw UI based on active screen
+                const isDashboard = document.getElementById('tab-dashboard').style.display !== 'none';
+                if (isDashboard) {
+                    updateDashboardStats();
+                    renderCharts();
+                } else if (document.getElementById('tab-transactions').style.display !== 'none') {
+                    renderTransactions();
+                } else if (document.getElementById('tab-inventory').style.display !== 'none') {
+                    renderInventory();
+                } else if (document.getElementById('tab-budgets').style.display !== 'none') {
+                    renderBudgets();
+                }
+
+            } catch (err) {
+                console.error("Sync error: ", err);
+                showToast("ซิงค์คลาวด์ล้มเหลว ตรวจสอบความถูกต้องของลิงก์และอินเทอร์เน็ต", "error");
+            } finally {
+                updateSyncUI(true, false);
+            }
+        }
+
+        async function testConnection() {
+            const urlInput = document.getElementById('cloud-url').value.trim();
+            if (!urlInput) {
+                showToast("กรุณากรอกข้อมูล Web App URL ก่อนกดทดสอบครับ", "error");
+                return;
+            }
+
+            showToast("กำลังเชื่อมต่อไปยัง Google Apps Script...", "info");
+
+            try {
+                const res = await fetch(`${urlInput}?action=getData`, { method: 'GET', mode: 'cors' });
+                const test = await res.json();
+                if (test && !test.error) {
+                    showToast("เชื่อมต่อฐานข้อมูลบนคลาวด์สำเร็จแล้ว!");
+                } else {
+                    showToast("ตอบสนองผิดพลาด: " + (test.error || "ไม่พบหัวตารางที่ถูกต้อง"), "error");
+                }
+            } catch (err) {
+                showToast("การเชื่อมต่อขัดข้อง: ตรวจสอบความถูกต้องของ URL", "error");
+            }
+        }
+
+        function saveCloudSettings() {
+            const urlInput = document.getElementById('cloud-url').value.trim();
+            if (!urlInput) {
+                showToast("กรุณากรอกข้อมูล ลิงก์ API คลาวด์ของคุณ", "error");
+                return;
+            }
+
+            state.cloudUrl = urlInput;
+            saveStateToStorage();
+            updateSyncUI(true);
+            showToast("บันทึกการเชื่อมตั้งค่าสำเร็จแล้ว!");
+            syncWithCloud();
+        }
+
+        function clearCloudSettings() {
+            state.cloudUrl = "";
+            document.getElementById('cloud-url').value = "";
+            saveStateToStorage();
+            updateSyncUI(false);
+            showToast("ยกเลิกการตั้งค่าคลาวด์กลับสู่ระบบออฟไลน์");
+        }
+
+        // Send created transaction directly to cloud
+        async function sendTransactionToCloud(transaction) {
+            if (!state.cloudUrl) return;
+            try {
+                await fetch(state.cloudUrl, {
+                    method: 'POST',
+                    mode: 'no-cors', // Apps Script needs no-cors or redirect handling
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: "saveTransaction",
+                        ...transaction
+                    })
+                });
+            } catch(e) {
+                console.error("Error backing up to cloud automatically: ", e);
+            }
+        }
+
+        // --- 4. Navigation & Layouts Tab ---
         function switchTab(tabName) {
             const tabs = ['dashboard', 'transactions', 'inventory', 'budgets', 'settings'];
-            tabs.forEach(nav => {
-                const btn = document.getElementById(`nav-${nav}`);
-                const mobBtn = document.getElementById(`mob-${nav}`);
+            tabs.forEach(tab => {
+                const btn = document.getElementById(`nav-${tab}`);
+                const mobBtn = document.getElementById(`mob-${tab}`);
+                const section = document.getElementById(`tab-${tab}`);
                 
-                if (nav === tabName) {
-                    btn.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-left font-medium bg-orange-600 text-white shadow-sm";
-                    if (mobBtn) mobBtn.className = "flex flex-col items-center gap-1 text-orange-500 font-semibold";
+                if (tab === tabName) {
+                    btn.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-left font-medium bg-primary-600 text-white shadow-sm";
+                    if (mobBtn) mobBtn.className = "flex flex-col items-center gap-1 text-primary-500";
+                    section.classList.remove('hidden');
                 } else {
                     btn.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-left font-medium text-slate-300 hover:bg-slate-800 hover:text-white";
                     if (mobBtn) mobBtn.className = "flex flex-col items-center gap-1 text-slate-400";
+                    section.classList.add('hidden');
                 }
             });
 
-            const headerTitles = {
-                dashboard: { title: "แดชบอร์ดสรุปยอดร้านอาหาร", desc: "วิเคราะห์ยอดขาย ต้นทุนวัตถุดิบ และค่าใช้จ่ายคงที่ (Fixed Costs)" },
-                transactions: { title: "บันทึกบัญชีร้านค้า", desc: "ตรวจสอบ แก้ไข และสืบค้นบิลรายรับ-รายจ่ายค่าน้ำไฟ วัตถุดิบและค่าจ้าง" },
-                inventory: { title: "คลังวัตถุดิบ & สินค้าคงคลัง", desc: "จัดการสต็อกสินค้า แจ้งเตือนปริมาณเหลือน้อย และควบคุมค่าวัตถุดิบ" },
-                budgets: { title: "ควบคุมค่าใช้จ่าย & ฟิกคอส", desc: "คุมงบประมาณของร้านไม่ให้บานปลายด้วยระเบียบทางการเงิน" },
-                settings: { title: "สำรองข้อมูลระบบหลังบ้าน", desc: "รักษาความปลอดภัยประวัติทั้งหมดเพื่อป้องกันข้อมูลสูญหาย" }
+            // Headings configuration
+            const headings = {
+                dashboard: { title: "แดชบอร์ดวิเคราะห์การเงินร้าน", desc: "ภาพรวมยอดขายร้านอาหาร สัดส่วนวัตถุดิบ (Food Cost) และแจ้งเตือนสต็อก" },
+                transactions: { title: "สมุดบันทึก รายรับ-รายจ่าย", desc: "รายการเข้าออกละเอียด ค้นหา แก้ไข และกรองประวัติตามต้องการ" },
+                inventory: { title: "คลังและคุมสต็อกวัตถุดิบ", desc: "ยอดคงเหลือน้ำหนัก ของแห้ง วัตถุดิบสด เพื่อความโปร่งใสในครัว" },
+                budgets: { title: "คุมรายจ่ายร้าน & Fixed Costs", desc: "ตั้งและคำนวณเป้าหมายยอดค่าจ่ายไม่ให้ไหล บันทึกงบประหยัด" },
+                settings: { title: "เชื่อมโยง Cloud และฐานข้อมูล", desc: "เชื่อมต่อ LINE Bot, ระบบสแกน Gmail และ Google Sheets อัจฉริยะ" }
             };
 
-            document.getElementById('page-title').innerText = headerTitles[tabName].title;
-            document.getElementById('page-subtitle').innerText = headerTitles[tabName].desc;
-
-            tabs.forEach(nav => {
-                document.getElementById(`tab-${nav}`).style.display = (nav === tabName) ? 'block' : 'none';
-            });
+            document.getElementById('page-title').innerText = headings[tabName].title;
+            document.getElementById('page-subtitle').innerText = headings[tabName].desc;
 
             if (tabName === 'dashboard') {
                 updateDashboardStats();
@@ -728,68 +938,15 @@
             lucide.createIcons();
         }
 
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast-box');
-            const iconBg = document.getElementById('toast-icon-bg');
-            const icon = document.getElementById('toast-icon');
-            const text = document.getElementById('toast-message');
-
-            text.innerText = message;
-            
-            if (type === 'success') {
-                iconBg.className = "p-1.5 rounded-lg bg-emerald-500/20 text-emerald-400";
-                icon.setAttribute('data-lucide', 'check-circle');
-            } else if (type === 'error') {
-                iconBg.className = "p-1.5 rounded-lg bg-rose-500/20 text-rose-400";
-                icon.setAttribute('data-lucide', 'alert-circle');
-            } else {
-                iconBg.className = "p-1.5 rounded-lg bg-indigo-500/20 text-indigo-400";
-                icon.setAttribute('data-lucide', 'info');
-            }
-
-            lucide.createIcons();
-            
-            toast.classList.remove('translate-y-[-120%]', 'opacity-0', 'pointer-events-none');
-            toast.classList.add('translate-y-0', 'opacity-100');
-
-            setTimeout(() => {
-                toast.classList.add('translate-y-[-120%]', 'opacity-0', 'pointer-events-none');
-                toast.classList.remove('translate-y-0', 'opacity-100');
-            }, 3000);
-        }
-
-        function openModal(id) {
-            document.getElementById(id).classList.remove('hidden');
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).classList.add('hidden');
-            if (id === 'transaction-modal') {
-                document.getElementById('transaction-form').reset();
-                document.getElementById('trans-id').value = '';
-                document.getElementById('modal-title').innerText = "บันทึกรายการบัญชีใหม่";
-                document.getElementById('trans-date').value = new Date().toISOString().split('T')[0];
-                toggleFormType('income');
-            } else if (id === 'inventory-modal') {
-                document.getElementById('inv-item-id').value = '';
-                document.getElementById('inv-modal-title').innerText = "เพิ่มสต็อกวัตถุดิบ";
-                document.getElementById('inv-item-name').value = '';
-                document.getElementById('inv-item-qty').value = '';
-                document.getElementById('inv-item-cost').value = '';
-                document.getElementById('inv-item-min').value = '';
-            }
-        }
-
-        // --- 4. Transaction Logic ---
+        // --- 5. Transactions Logic ---
         function toggleFormType(type) {
-            const categorySelect = document.getElementById('trans-category');
-            categorySelect.innerHTML = '';
-            
+            const select = document.getElementById('trans-category');
+            select.innerHTML = '';
             defaultCategories[type].forEach(cat => {
                 const opt = document.createElement('option');
                 opt.value = cat.id;
                 opt.innerText = cat.name;
-                categorySelect.appendChild(opt);
+                select.appendChild(opt);
             });
         }
 
@@ -798,22 +955,20 @@
         }
 
         function populateFilterOptions() {
-            const filterCat = document.getElementById('filter-category');
-            filterCat.innerHTML = '<option value="all">ทุกหมวดหมู่</option>';
-            
-            const combinedCats = [...defaultCategories.income, ...defaultCategories.expense];
-            combinedCats.forEach(cat => {
+            const filterSelect = document.getElementById('filter-category');
+            filterSelect.innerHTML = '<option value="all">ทุกหมวดหมู่</option>';
+            const combined = [...defaultCategories.income, ...defaultCategories.expense];
+            combined.forEach(cat => {
                 const opt = document.createElement('option');
                 opt.value = cat.id;
                 opt.innerText = cat.name;
-                filterCat.appendChild(opt);
+                filterSelect.appendChild(opt);
             });
         }
 
         function saveTransaction(e) {
             e.preventDefault();
-            
-            const transId = document.getElementById('trans-id').value;
+            const id = document.getElementById('trans-id').value;
             const type = document.querySelector('input[name="trans-type"]:checked').value;
             const title = document.getElementById('trans-title').value.trim();
             const amount = parseFloat(document.getElementById('trans-amount').value);
@@ -821,508 +976,187 @@
             const category = document.getElementById('trans-category').value;
             const notes = document.getElementById('trans-notes').value.trim();
 
-            if (!title || isNaN(amount) || amount <= 0 || !date || !category) {
-                showToast("ข้อมูลไม่ครบถ้วน คลุมต้นทุนไม่ถูกต้อง", "error");
+            if (!title || isNaN(amount) || amount <= 0 || !date) {
+                showToast("กรอกข้อมูลรายรับ-รายจ่ายให้สมบูรณ์ครับ", "error");
                 return;
             }
 
-            if (transId) {
-                const idx = state.transactions.findIndex(t => t.id === transId);
-                if (idx !== -1) {
-                    state.transactions[idx] = { id: transId, type, title, amount, date, category, notes };
-                    showToast("แก้ไขประวัติสำเร็จ");
-                }
+            const transData = { id: id || 't-' + Date.now(), type, title, amount, date, category, notes };
+
+            if (id) {
+                const idx = state.transactions.findIndex(t => t.id === id);
+                if (idx !== -1) state.transactions[idx] = transData;
+                showToast("แก้ไขข้อมูลรายการบัญชีสำเร็จ!");
             } else {
-                const newTrans = {
-                    id: 't-' + Date.now(),
-                    type, title, amount, date, category, notes
-                };
-                state.transactions.push(newTrans);
-                showToast("บันทึกบัญชีเรียบร้อย");
+                state.transactions.push(transData);
+                showToast("บันทึกรายการรายรับ-รายจ่ายเสร็จสิ้น!");
+                sendTransactionToCloud(transData); // Sync background
             }
 
             saveStateToStorage();
             closeModal('transaction-modal');
-            
-            const isDashboard = document.getElementById('tab-dashboard').style.display !== 'none';
-            if (isDashboard) {
-                updateDashboardStats();
-                renderCharts();
-            } else {
-                renderTransactions();
-            }
+            renderTransactions();
         }
 
         function editTransaction(id) {
-            const trans = state.transactions.find(t => t.id === id);
-            if (!trans) return;
+            const t = state.transactions.find(item => item.id === id);
+            if (!t) return;
 
-            document.getElementById('trans-id').value = trans.id;
-            document.getElementById('modal-title').innerText = "แก้ไขข้อมูลรายการ";
+            document.getElementById('trans-id').value = t.id;
+            document.getElementById('modal-title').innerText = "แก้ไขข้อมูลรายการบัญชี";
             
             const radios = document.getElementsByName('trans-type');
-            radios.forEach(r => {
-                if (r.value === trans.type) {
-                    r.checked = true;
-                }
-            });
+            radios.forEach(r => { if (r.value === t.type) r.checked = true; });
 
-            toggleFormType(trans.type);
-            
-            document.getElementById('trans-title').value = trans.title;
-            document.getElementById('trans-amount').value = trans.amount;
-            document.getElementById('trans-date').value = trans.date;
-            document.getElementById('trans-category').value = trans.category;
-            document.getElementById('trans-notes').value = trans.notes || '';
+            toggleFormType(t.type);
+            document.getElementById('trans-title').value = t.title;
+            document.getElementById('trans-amount').value = t.amount;
+            document.getElementById('trans-date').value = t.date;
+            document.getElementById('trans-category').value = t.category;
+            document.getElementById('trans-notes').value = t.notes || '';
 
             openModal('transaction-modal');
         }
 
         function deleteTransaction(id) {
-            state.transactions = state.transactions.filter(t => t.id !== id);
-            saveStateToStorage();
-            showToast("ลบข้อมูลรายการแล้ว", "success");
-            
-            const isDashboard = document.getElementById('tab-dashboard').style.display !== 'none';
-            if (isDashboard) {
-                updateDashboardStats();
-                renderCharts();
-            } else {
+            if (confirm("คุณแน่ใจว่าต้องการลบรายการบัญชีนี้ใช่หรือไม่?")) {
+                state.transactions = state.transactions.filter(t => t.id !== id);
+                saveStateToStorage();
+                showToast("ลบรายการทำธุรกรรมแล้ว");
                 renderTransactions();
             }
         }
 
-        // --- 5. Dashboard Calculations & Financial Analytics ---
-        function updateDashboardStats() {
-            let totalIncome = 0;
-            let totalExpense = 0;
-            let foodCost = 0;
-
-            state.transactions.forEach(t => {
-                if (t.type === 'income') {
-                    totalIncome += t.amount;
-                } else {
-                    totalExpense += t.amount;
-                    if (t.category === 'raw-mat') {
-                        foodCost += t.amount;
-                    }
-                }
-            });
-
-            const balance = totalIncome - totalExpense;
-            const foodCostRate = totalIncome > 0 ? Math.round((foodCost / totalIncome) * 100) : 0;
-
-            document.getElementById('stat-balance').innerText = `฿${balance.toLocaleString('th-TH', { minimumFractionDigits: 2 })}`;
-            document.getElementById('stat-income').innerText = `฿${totalIncome.toLocaleString('th-TH', { minimumFractionDigits: 2 })}`;
-            document.getElementById('stat-expense').innerText = `฿${totalExpense.toLocaleString('th-TH', { minimumFractionDigits: 2 })}`;
-            
-            const foodCostElem = document.getElementById('stat-foodcost-rate');
-            foodCostElem.innerText = `${foodCostRate}%`;
-            
-            if (foodCostRate > 40) {
-                foodCostElem.className = "text-2xl font-bold text-rose-600 mt-1";
-                document.getElementById('stat-foodcost-desc').innerText = "ต้นทุนวัตถุดิบสูงมาก! ควรควบคุมสต็อก";
-            } else if (foodCostRate >= 25 && foodCostRate <= 35) {
-                foodCostElem.className = "text-2xl font-bold text-emerald-600 mt-1";
-                document.getElementById('stat-foodcost-desc').innerText = "ต้นทุนวัตถุดิบอยู่ในเกณฑ์ดีเยี่ยม";
-            } else {
-                foodCostElem.className = "text-2xl font-bold text-amber-500 mt-1";
-                document.getElementById('stat-foodcost-desc').innerText = "ระดับปกติ อยู่ในขั้นคุมความเสี่ยง";
-            }
-
-            populateDashboardRecent();
-            populateDashboardStockAlerts();
-        }
-
-        function populateDashboardRecent() {
-            const container = document.getElementById('recent-transactions-list');
-            container.innerHTML = '';
-            
-            const sorted = [...state.transactions].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
-
-            if (sorted.length === 0) {
-                container.innerHTML = `<div class="text-center py-10 text-slate-400 text-xs">ยังไม่มีรายการเดินบัญชี</div>`;
-                return;
-            }
-
-            sorted.forEach(t => {
-                const catObj = [...defaultCategories.income, ...defaultCategories.expense].find(c => c.id === t.category) || { name: 'อื่นๆ', color: 'bg-slate-100 text-slate-800' };
-                const isIncome = t.type === 'income';
-                
-                const itemHtml = `
-                    <div class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 border border-slate-100 transition">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2.5 rounded-xl ${isIncome ? 'bg-emerald-50 text-emerald-600' : 'bg-orange-50 text-orange-600'}">
-                                <i data-lucide="${isIncome ? 'trending-up' : 'trending-down'}" class="w-4 h-4"></i>
-                            </div>
-                            <div>
-                                <h5 class="text-xs font-semibold text-slate-800 leading-snug">${t.title}</h5>
-                                <span class="text-[10px] text-slate-400 block mt-0.5">${formatThaiDate(t.date)} &bull; ${catObj.name}</span>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <span class="text-xs font-bold ${isIncome ? 'text-emerald-600' : 'text-slate-800'}">
-                                ${isIncome ? '+' : '-'}฿${t.amount.toLocaleString('th-TH')}
-                            </span>
-                        </div>
-                    </div>
-                `;
-                container.insertAdjacentHTML('beforeend', itemHtml);
-            });
-            lucide.createIcons();
-        }
-
-        function populateDashboardStockAlerts() {
-            const container = document.getElementById('dashboard-stock-alerts');
-            container.innerHTML = '';
-
-            const lowStockItems = state.inventory.filter(item => item.quantity <= item.minQuantity);
-
-            if (lowStockItems.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-12 text-slate-400 flex flex-col justify-center items-center h-full">
-                        <i data-lucide="shield-check" class="w-12 h-12 text-emerald-500 mb-2 opacity-80"></i>
-                        <p class="text-xs font-semibold text-emerald-700">คลังวัตถุดิบทั้งหมดอยู่ในเกณฑ์ปกติ</p>
-                        <p class="text-[10px] text-slate-400">ยังไม่มีวัตถุดิบใกล้หมดคลังในขณะนี้</p>
-                    </div>
-                `;
-                lucide.createIcons();
-                return;
-            }
-
-            lowStockItems.forEach(item => {
-                const itemHtml = `
-                    <div class="flex items-center justify-between p-3 rounded-xl bg-rose-50 border border-rose-100">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2 rounded-xl bg-white text-rose-600 border border-rose-200">
-                                <i data-lucide="alert-triangle" class="w-4 h-4"></i>
-                            </div>
-                            <div>
-                                <h5 class="text-xs font-bold text-slate-800">${item.name}</h5>
-                                <p class="text-[10px] text-rose-600 font-semibold mt-0.5">เหลือเพียง: ${item.quantity} ${item.unit} (เกณฑ์ต่ำสุด: ${item.minQuantity})</p>
-                            </div>
-                        </div>
-                        <button onclick="quickRefill('${item.id}')" class="bg-rose-600 hover:bg-rose-700 text-white font-semibold text-[10px] px-3 py-1.5 rounded-lg transition shadow-sm">
-                            จัดซื้อด่วน
-                        </button>
-                    </div>
-                `;
-                container.insertAdjacentHTML('beforeend', itemHtml);
-            });
-            lucide.createIcons();
-        }
-
-        function renderCharts() {
-            if (flowChartInstance) flowChartInstance.destroy();
-            if (categoryChartInstance) categoryChartInstance.destroy();
-
-            const latest = [...state.transactions].sort((a, b) => new Date(a.date) - new Date(b.date)).slice(-7);
-            const flowLabels = latest.map(t => formatThaiDateShort(t.date));
-            const flowIncomeData = latest.map(t => t.type === 'income' ? t.amount : null);
-            const flowExpenseData = latest.map(t => t.type === 'expense' ? t.amount : null);
-
-            const ctxFlow = document.getElementById('flowChart').getContext('2d');
-            flowChartInstance = new Chart(ctxFlow, {
-                type: 'bar',
-                data: {
-                    labels: flowLabels,
-                    datasets: [
-                        {
-                            label: 'ยอดขายหน้าร้าน/เดลิเวอรี (฿)',
-                            data: flowIncomeData,
-                            backgroundColor: '#10b981',
-                            borderRadius: 6,
-                            maxBarThickness: 24,
-                        },
-                        {
-                            label: 'ต้นทุน/ฟิกคอส (฿)',
-                            data: flowExpenseData,
-                            backgroundColor: '#f43f5e',
-                            borderRadius: 6,
-                            maxBarThickness: 24,
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: '#f1f5f9' },
-                            ticks: { font: { family: 'Prompt' } }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: { font: { family: 'Prompt' } }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: { font: { family: 'Prompt', size: 11 } }
-                        }
-                    }
-                }
-            });
-
-            // Pie chart variables
-            const expCategories = defaultCategories.expense;
-            const pieLabels = [];
-            const pieData = [];
-            const pieColors = [];
-
-            expCategories.forEach(cat => {
-                let sum = 0;
-                state.transactions.forEach(t => {
-                    if (t.type === 'expense' && t.category === cat.id) {
-                        sum += t.amount;
-                    }
-                });
-                if (sum > 0) {
-                    pieLabels.push(cat.name);
-                    pieData.push(sum);
-                    pieColors.push(cat.text);
-                }
-            });
-
-            if (pieData.length === 0) {
-                pieLabels.push('ยังไม่มีรายจ่ายคุมสต็อก');
-                pieData.push(1);
-                pieColors.push('#cbd5e1');
-            }
-
-            const ctxCat = document.getElementById('categoryChart').getContext('2d');
-            categoryChartInstance = new Chart(ctxCat, {
-                type: 'doughnut',
-                data: {
-                    labels: pieLabels,
-                    datasets: [{
-                        data: pieData,
-                        backgroundColor: pieColors,
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                font: { family: 'Prompt', size: 10 },
-                                boxWidth: 12
-                            }
-                        }
-                    },
-                    cutout: '60%'
-                }
-            });
-        }
-
-        // --- 6. Transactions Tab Filter/Table ---
         function renderTransactions() {
-            const tableBody = document.getElementById('transactions-table-body');
-            const noTransDiv = document.getElementById('no-transactions');
-            tableBody.innerHTML = '';
+            const tbody = document.getElementById('transactions-table-body');
+            const noTrans = document.getElementById('no-transactions');
+            tbody.innerHTML = '';
 
-            const searchVal = document.getElementById('filter-search').value.toLowerCase();
-            const catVal = document.getElementById('filter-category').value;
-            const typeVal = document.getElementById('filter-type').value;
+            const search = document.getElementById('filter-search').value.toLowerCase();
+            const cat = document.getElementById('filter-category').value;
+            const type = document.getElementById('filter-type').value;
 
             const filtered = state.transactions.filter(t => {
-                const matchesSearch = t.title.toLowerCase().includes(searchVal) || (t.notes && t.notes.toLowerCase().includes(searchVal));
-                const matchesCat = catVal === 'all' ? true : t.category === catVal;
-                const matchesType = typeVal === 'all' ? true : t.type === typeVal;
-                return matchesSearch && matchesCat && matchesType;
+                const matchSearch = t.title.toLowerCase().includes(search) || (t.notes && t.notes.toLowerCase().includes(search));
+                const matchCat = cat === 'all' ? true : t.category === cat;
+                const matchType = type === 'all' ? true : t.type === type;
+                return matchSearch && matchCat && matchType;
             });
 
-            filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+            filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
 
             if (filtered.length === 0) {
-                noTransDiv.classList.remove('hidden');
+                noTrans.classList.remove('hidden');
                 return;
             } else {
-                noTransDiv.classList.add('hidden');
+                noTrans.classList.add('hidden');
             }
 
             filtered.forEach(t => {
                 const isInc = t.type === 'income';
-                const catObj = [...defaultCategories.income, ...defaultCategories.expense].find(c => c.id === t.category) || { name: 'อื่นๆ', color: 'bg-slate-100 text-slate-800' };
-                
+                const catObj = [...defaultCategories.income, ...defaultCategories.expense].find(c => c.id === t.category) || { name: 'อื่นๆ', color: 'bg-slate-100' };
+
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
-                
+                tr.className = "hover:bg-slate-50 border-b border-slate-100 transition";
                 tr.innerHTML = `
-                    <td class="py-3.5 pl-4 font-medium text-slate-500 text-xs">${formatThaiDate(t.date)}</td>
-                    <td class="py-3.5">
-                        <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full ${isInc ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-orange-50 text-orange-700 border border-orange-200'}">
-                            <span class="w-1.5 h-1.5 rounded-full ${isInc ? 'bg-emerald-500' : 'bg-orange-500'}"></span>
+                    <td class="py-3 pl-4 font-medium text-xs text-slate-500">${formatThaiDate(t.date)}</td>
+                    <td class="py-3">
+                        <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full ${isInc ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-rose-50 text-rose-700 border border-rose-100'}">
                             ${isInc ? 'รายรับ' : 'รายจ่าย'}
                         </span>
                     </td>
-                    <td class="py-3.5">
+                    <td class="py-3">
                         <div class="font-semibold text-slate-800">${t.title}</div>
-                        ${t.notes ? `<p class="text-xs text-slate-400 mt-0.5">${t.notes}</p>` : ''}
+                        ${t.notes ? `<div class="text-xs text-slate-400 mt-0.5">${t.notes}</div>` : ''}
                     </td>
-                    <td class="py-3.5">
+                    <td class="py-3">
                         <span class="text-xs px-2.5 py-1 rounded-full border ${catObj.color}">${catObj.name}</span>
                     </td>
-                    <td class="py-3.5 text-right font-bold text-sm ${isInc ? 'text-emerald-600' : 'text-slate-800'}">
+                    <td class="py-3 text-right font-bold text-sm ${isInc ? 'text-emerald-600' : 'text-slate-800'}">
                         ${isInc ? '+' : '-'}฿${t.amount.toLocaleString('th-TH', { minimumFractionDigits: 2 })}
                     </td>
-                    <td class="py-3.5 text-center">
+                    <td class="py-3 text-center">
                         <div class="flex items-center justify-center gap-2">
-                            <button onclick="editTransaction('${t.id}')" class="p-1.5 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition" title="แก้ไข">
-                                <i data-lucide="pencil" class="w-4 h-4"></i>
-                            </button>
-                            <button onclick="deleteTransaction('${t.id}')" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition" title="ลบ">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            </button>
+                            <button onclick="editTransaction('${t.id}')" class="p-1.5 text-slate-400 hover:text-slate-900 rounded-lg"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                            <button onclick="deleteTransaction('${t.id}')" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         </div>
                     </td>
                 `;
-                tableBody.appendChild(tr);
+                tbody.appendChild(tr);
             });
-
             lucide.createIcons();
         }
 
-        // --- 7. Inventory Stock Control System ---
+        // --- 6. Inventory Logistics ---
         function renderInventory() {
-            const container = document.getElementById('inventory-grid-container');
-            container.innerHTML = '';
-
-            state.inventory.forEach(item => {
-                const isLow = item.quantity <= item.minQuantity;
-                const totalCostVal = item.quantity * item.costPerUnit;
-
-                const cardHtml = `
-                    <div class="border rounded-2xl p-5 bg-white transition hover:shadow-md ${isLow ? 'border-rose-300 bg-rose-50/20' : 'border-slate-200'}">
-                        <div class="flex justify-between items-start mb-3">
-                            <div>
-                                <h5 class="font-bold text-slate-800 text-sm">${item.name}</h5>
-                                <span class="text-[10px] text-slate-400">หมวดหมู่: ${translateInvCategory(item.category)}</span>
-                            </div>
-                            <span class="text-xs px-2.5 py-1 rounded-full ${isLow ? 'bg-rose-100 text-rose-800 font-bold' : 'bg-slate-100 text-slate-700'}">
-                                ${isLow ? 'ของใกล้หมดคลัง!' : 'สต็อกปกติ'}
-                            </span>
-                        </div>
-
-                        <div class="space-y-2.5 mt-4">
-                            <div class="flex justify-between items-center text-xs">
-                                <span class="text-slate-500">คงเหลือในคลัง:</span>
-                                <span class="font-bold text-slate-800 text-base">${item.quantity} ${item.unit}</span>
-                            </div>
-                            <div class="flex justify-between items-center text-xs">
-                                <span class="text-slate-500">ต้นทุนซื้อต่อหน่วย:</span>
-                                <span class="font-medium text-slate-800">฿${item.costPerUnit.toLocaleString()} / ${item.unit}</span>
-                            </div>
-                            <div class="flex justify-between items-center text-xs border-t border-slate-100 pt-2">
-                                <span class="text-slate-500 font-semibold">มูลค่าสต็อกคงเหลือ:</span>
-                                <span class="font-bold text-orange-600">฿${totalCostVal.toLocaleString()}</span>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-slate-100">
-                            <button onclick="editInventoryItem('${item.id}')" class="text-xs border border-slate-200 text-slate-700 py-2 rounded-xl hover:bg-slate-50 transition flex items-center justify-center gap-1">
-                                <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
-                                <span>ปรับสเปก</span>
-                            </button>
-                            <button onclick="quickRefill('${item.id}')" class="text-xs bg-orange-600 text-white py-2 rounded-xl hover:bg-orange-700 transition flex items-center justify-center gap-1 font-semibold">
-                                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                                <span>เติมสต็อก</span>
-                            </button>
-                        </div>
-                    </div>
-                `;
-                container.insertAdjacentHTML('beforeend', cardHtml);
-            });
+            const tbody = document.getElementById('inventory-table-body');
+            const noInv = document.getElementById('no-inventory');
+            tbody.innerHTML = '';
 
             if (state.inventory.length === 0) {
-                container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400">ยังไม่มีประวัติการบันทึกวัตถุดิบ</div>`;
+                noInv.classList.remove('hidden');
+                return;
+            } else {
+                noInv.classList.add('hidden');
             }
 
+            state.inventory.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 border-b border-slate-100 transition";
+                
+                const isLow = item.quantity <= 3; // Threashold warning
+                
+                tr.innerHTML = `
+                    <td class="py-3.5 pl-4 text-xs font-semibold text-slate-400">${item.id}</td>
+                    <td class="py-3.5 font-bold text-slate-800">${item.name}</td>
+                    <td class="py-3.5"><span class="text-xs text-slate-500">${translateCat(item.category)}</span></td>
+                    <td class="py-3.5 text-center">
+                        <span class="px-3 py-1 rounded-full font-bold text-xs ${isLow ? 'bg-rose-50 text-rose-600 border border-rose-200' : 'bg-slate-100 text-slate-800'}">
+                            ${item.quantity} ${item.unit}
+                        </span>
+                    </td>
+                    <td class="py-3.5 text-right font-semibold">฿${item.costPerUnit} / ${item.unit}</td>
+                    <td class="py-3.5 text-center">
+                        <div class="flex items-center justify-center gap-2">
+                            <button onclick="restockItem('${item.id}')" class="bg-emerald-50 text-emerald-600 border border-emerald-200 px-2.5 py-1 rounded-lg text-xs font-bold hover:bg-emerald-100 flex items-center gap-1">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i> เติมสต็อก
+                            </button>
+                            <button onclick="editInventoryItem('${item.id}')" class="p-1.5 text-slate-400 hover:text-slate-800"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                            <button onclick="deleteInventoryItem('${item.id}')" class="p-1.5 text-slate-400 hover:text-rose-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
             lucide.createIcons();
-        }
-
-        function translateInvCategory(cat) {
-            const types = { meat: 'เนื้อสัตว์/อาหารทะเล', veg: 'ผักสด/ผลไม้', dry: 'ของแห้ง/เครื่องปรุง', drink: 'เครื่องดื่ม', pack: 'บรรจุภัณฑ์/ของใช้' };
-            return types[cat] || 'อื่นๆ';
-        }
-
-        function openInventoryModal() {
-            document.getElementById('inv-item-id').value = '';
-            document.getElementById('inv-modal-title').innerText = "เพิ่มวัตถุดิบในคลังสต็อก";
-            openModal('inventory-modal');
         }
 
         function saveInventoryItem(e) {
             e.preventDefault();
-
-            const itemId = document.getElementById('inv-item-id').value;
+            const id = document.getElementById('inv-item-id').value;
             const name = document.getElementById('inv-item-name').value.trim();
-            const category = document.getElementById('inv-item-type').value;
+            const cat = document.getElementById('inv-item-category').value;
             const unit = document.getElementById('inv-item-unit').value.trim();
-            const quantity = parseFloat(document.getElementById('inv-item-qty').value);
+            const qty = parseFloat(document.getElementById('inv-item-qty').value);
             const cost = parseFloat(document.getElementById('inv-item-cost').value);
-            const min = parseFloat(document.getElementById('inv-item-min').value);
 
-            if (!name || isNaN(quantity) || isNaN(cost) || isNaN(min)) {
-                showToast("กรุณากรอกข้อมูลจำนวนให้ครบถ้วน", "error");
+            if (!name || isNaN(qty) || isNaN(cost)) {
+                showToast("ป้อนข้อมูลสต็อกให้ครบถ้วนด้วยครับ", "error");
                 return;
             }
 
-            if (itemId) {
-                // Adjusting / Editing existing
-                const idx = state.inventory.findIndex(i => i.id === itemId);
+            if (id) {
+                const idx = state.inventory.findIndex(item => item.id === id);
                 if (idx !== -1) {
-                    const oldQty = state.inventory[idx].quantity;
-                    const diff = quantity - oldQty;
-
-                    // If inventory increased, auto-generate raw-mat expense
-                    if (diff > 0) {
-                        const autoExpense = diff * cost;
-                        const autoTrans = {
-                            id: 't-auto-' + Date.now(),
-                            type: 'expense',
-                            title: `จัดซื้อเพิ่มวัตถุดิบ: ${name} (+${diff} ${unit})`,
-                            amount: autoExpense,
-                            date: new Date().toISOString().split('T')[0],
-                            category: 'raw-mat',
-                            notes: 'บันทึกอัตโนมัติจากระบบคลังวัตถุดิบ'
-                        };
-                        state.transactions.push(autoTrans);
-                        showToast(`เพิ่มวัตถุดิบและสร้างบิลจ่าย ฿${autoExpense.toLocaleString()} แล้ว`);
-                    }
-
-                    state.inventory[idx] = { id: itemId, name, category, unit, quantity, costPerUnit: cost, minQuantity: min };
+                    state.inventory[idx] = { id, name, category: cat, quantity: qty, unit, costPerUnit: cost };
+                    showToast("อัปเดตข้อมูลวัตถุดิบเรียบร้อย!");
                 }
             } else {
-                // New item
-                const newItem = {
-                    id: 'i-' + Date.now(),
-                    name, category, unit, quantity, costPerUnit: cost, minQuantity: min
-                };
-                state.inventory.push(newItem);
-
-                // Auto-expense for first-time creation stock
-                if (quantity > 0) {
-                    const autoExpense = quantity * cost;
-                    const autoTrans = {
-                        id: 't-auto-' + Date.now(),
-                        type: 'expense',
-                        title: `เปิดสต็อกแรกเข้า: ${name} (${quantity} ${unit})`,
-                        amount: autoExpense,
-                        date: new Date().toISOString().split('T')[0],
-                        category: 'raw-mat',
-                        notes: 'บันทึกสต็อกแรกเข้า'
-                    };
-                    state.transactions.push(autoTrans);
-                }
-
-                showToast("บันทึกวัตถุดิบในสต็อกร้านแล้ว");
+                state.inventory.push({
+                    id: 'inv' + (state.inventory.length + 1),
+                    name, category: cat, quantity: qty, unit, costPerUnit: cost
+                });
+                showToast("บันทึกรับวัตถุดิบตัวใหม่สำเร็จ!");
             }
 
             saveStateToStorage();
@@ -1335,172 +1169,361 @@
             if (!item) return;
 
             document.getElementById('inv-item-id').value = item.id;
-            document.getElementById('inv-modal-title').innerText = "ปรับเปลี่ยนข้อมูลและสเปกสต็อก";
+            document.getElementById('inventory-modal-title').innerText = "แก้ไขรายละเอียดวัตถุดิบ";
             
             document.getElementById('inv-item-name').value = item.name;
-            document.getElementById('inv-item-type').value = item.category;
+            document.getElementById('inv-item-category').value = item.category;
             document.getElementById('inv-item-unit').value = item.unit;
             document.getElementById('inv-item-qty').value = item.quantity;
             document.getElementById('inv-item-cost').value = item.costPerUnit;
-            document.getElementById('inv-item-min').value = item.minQuantity;
 
             openModal('inventory-modal');
         }
 
-        function quickRefill(id) {
+        function restockItem(id) {
             const item = state.inventory.find(i => i.id === id);
             if (!item) return;
 
-            const addedQty = prompt(`ระบุจำนวนที่ต้องการซื้อเติมสต็อกสำหรับ "${item.name}" (หน่วย: ${item.unit}):`, "10");
-            if (addedQty === null) return;
-
-            const qtyVal = parseFloat(addedQty);
-            if (isNaN(qtyVal) || qtyVal <= 0) {
-                showToast("กรอกจำนวนที่ต้องการซื้อเติมสต็อกไม่ถูกต้อง", "error");
+            const addQty = prompt(`ระบุจำนวนที่ต้องการซื้อเติมสต็อก "${item.name}" (หน่วย: ${item.unit}):`);
+            if (addQty === null) return;
+            
+            const qtyNum = parseFloat(addQty);
+            if (isNaN(qtyNum) || qtyNum <= 0) {
+                showToast("กรอกจำนวนที่ต้องเพิ่มให้ถูกต้อง!", "error");
                 return;
             }
 
-            // Calculations
-            const costOfRefill = qtyVal * item.costPerUnit;
-            item.quantity += qtyVal;
+            // Update Stock
+            item.quantity += qtyNum;
+            const costTotal = qtyNum * item.costPerUnit;
 
-            // Generate expense
-            const autoTrans = {
-                id: 't-refill-' + Date.now(),
+            // Automatically record an expense transaction linked to this purchase
+            const newTrans = {
+                id: 't-stock-' + Date.now(),
                 type: 'expense',
-                title: `ซื้อสต็อกเติมด่วน: ${item.name} (+${qtyVal} ${item.unit})`,
-                amount: costOfRefill,
+                title: `จัดซื้อสต็อกเติม: ${item.name} (${qtyNum} ${item.unit})`,
+                amount: costTotal,
                 date: new Date().toISOString().split('T')[0],
                 category: 'raw-mat',
-                notes: `ซื้อวัตถุดิบเข้าคลังอัตโนมัติ ทุนหน่วยละ ฿${item.costPerUnit}`
+                notes: `บันทึกเติมคลังสต็อกวัตถุดิบอัตโนมัติ`
             };
+            
+            state.transactions.push(newTrans);
+            sendTransactionToCloud(newTrans); // sync sheets
 
-            state.transactions.push(autoTrans);
             saveStateToStorage();
-            
-            showToast(`สต็อกอัปเดต! บันทึกบัญชีต้นทุนวัตถุดิบ ฿${costOfRefill.toLocaleString()}`);
-            
-            // Refresh
-            const isDashboard = document.getElementById('tab-dashboard').style.display !== 'none';
-            if (isDashboard) {
-                updateDashboardStats();
-                renderCharts();
-            } else {
+            showToast(`เติมสต็อกสำเร็จ +${qtyNum} ${item.unit} พร้อมลงบันทึกรายจ่ายร้าน ฿${costTotal}`);
+            renderInventory();
+        }
+
+        function deleteInventoryItem(id) {
+            if (confirm("ลบวัตถุดิบออกจากสต็อกอย่างถาวร?")) {
+                state.inventory = state.inventory.filter(i => i.id !== id);
+                saveStateToStorage();
+                showToast("ลบข้อมูลสต็อกเรียบร้อย");
                 renderInventory();
             }
         }
 
-        // --- 8. Budgets & Fixed Cost Management ---
+        // --- 7. Fixed Costs & Budgets ---
         function renderBudgets() {
             const container = document.getElementById('budgets-grid-container');
             container.innerHTML = '';
 
-            const categories = defaultCategories.expense;
-
-            categories.forEach(cat => {
+            defaultCategories.expense.forEach(cat => {
                 const limit = state.budgets[cat.id] || 0;
-                let sum = 0;
-
+                let spent = 0;
                 state.transactions.forEach(t => {
-                    if (t.type === 'expense' && t.category === cat.id) {
-                        sum += t.amount;
-                    }
+                    if (t.type === 'expense' && t.category === cat.id) spent += t.amount;
                 });
 
-                const percentage = limit > 0 ? Math.min(Math.round((sum / limit) * 100), 100) : 0;
-                const isOver = sum > limit && limit > 0;
+                const percentage = limit > 0 ? Math.min(Math.round((spent / limit) * 100), 100) : 0;
+                const isOver = spent > limit && limit > 0;
 
-                const cardHtml = `
-                    <div class="border border-slate-200 rounded-2xl p-5 hover:shadow-md transition bg-slate-50/50 flex flex-col justify-between">
-                        <div>
-                            <div class="flex justify-between items-start mb-3">
-                                <div class="flex items-center gap-2.5">
-                                    <div class="p-2.5 rounded-xl bg-white border border-slate-200" style="color: ${cat.text};">
-                                        <i data-lucide="${cat.icon || 'tag'}" class="w-5 h-5"></i>
-                                    </div>
-                                    <div>
-                                        <h5 class="font-bold text-slate-800 text-sm">${cat.name}</h5>
-                                        <span class="text-[10px] text-slate-400">ขอบเขตค่าใช้จ่ายเป้าหมาย</span>
-                                    </div>
-                                </div>
-                                <button onclick="quickEditBudget('${cat.id}', ${limit})" class="text-xs text-orange-600 font-semibold hover:underline bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 transition">ระบุเพดานงบ</button>
+                const html = `
+                    <div class="border border-slate-200 rounded-2xl p-5 bg-slate-50 flex flex-col justify-between">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="p-2 bg-white rounded-lg border border-slate-200 text-primary-500"><i data-lucide="${cat.icon}" class="w-5 h-5"></i></span>
+                                <div><h5 class="font-bold text-slate-800 text-sm">${cat.name}</h5></div>
                             </div>
-
-                            <div class="space-y-2 mt-4">
-                                <div class="flex justify-between text-xs text-slate-500">
-                                    <span>จ่ายรวมแล้ว: ฿${sum.toLocaleString()}</span>
-                                    <span class="font-bold text-slate-800">เพดานงบ: ${limit > 0 ? `฿${limit.toLocaleString()}` : 'ยังไม่ได้ระบุ'}</span>
-                                </div>
-                                
-                                ${limit > 0 ? `
-                                <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
-                                    <div class="h-full rounded-full transition-all duration-500 ${isOver ? 'bg-rose-500' : percentage > 85 ? 'bg-amber-500' : 'bg-emerald-500'}" style="width: ${percentage}%"></div>
-                                </div>
-                                <div class="flex justify-between items-center text-[10px] mt-1">
-                                    <span class="${isOver ? 'text-rose-500 font-bold' : percentage > 85 ? 'text-amber-600' : 'text-emerald-600'} font-semibold">${percentage}% ของเป้าหมายงบ</span>
-                                    ${isOver ? `<span class="text-rose-500 font-bold">เกินงบแล้ว ฿${(sum - limit).toLocaleString()}</span>` : `<span>เหลือใช้ได้อีก ฿${(limit - sum).toLocaleString()}</span>`}
-                                </div>
-                                ` : `
-                                <div class="text-[10px] text-slate-400 italic">ไม่ได้กำหนดงบเพื่อป้องกันร้านขายขาดทุน</div>
-                                `}
+                            <button onclick="quickEditBudget('${cat.id}', ${limit})" class="text-xs font-bold text-primary-600 bg-white hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg">แก้งบ</button>
+                        </div>
+                        <div class="space-y-2 mt-4">
+                            <div class="flex justify-between text-xs text-slate-500">
+                                <span>ใช้จริงเดือนนี้: ฿${spent.toLocaleString()}</span>
+                                <span class="font-bold text-slate-800">งบประเมิน: ${limit > 0 ? `฿${limit.toLocaleString()}` : 'ไม่กำหนด'}</span>
                             </div>
+                            ${limit > 0 ? `
+                            <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                                <div class="h-full rounded-full ${isOver ? 'bg-rose-500' : 'bg-emerald-500'}" style="width: ${percentage}%"></div>
+                            </div>
+                            <div class="flex justify-between text-[10px] ${isOver ? 'text-rose-600' : 'text-emerald-600'} font-semibold">
+                                <span>${percentage}% ของงบร้าน</span>
+                                ${isOver ? `<span>เกินงบจำกัดไป ฿${(spent-limit).toLocaleString()}</span>` : `<span>ใช้อีกได้ ฿${(limit-spent).toLocaleString()}</span>`}
+                            </div>
+                            ` : '<p class="text-[10px] text-slate-400 italic">ไม่ได้จำกัดงบประมาณรายจ่ายนี้</p>'}
                         </div>
                     </div>
                 `;
-                container.insertAdjacentHTML('beforeend', cardHtml);
+                container.insertAdjacentHTML('beforeend', html);
             });
-
             lucide.createIcons();
         }
 
         function openBudgetModal() {
             const select = document.getElementById('budget-category');
             select.innerHTML = '';
-            
-            defaultCategories.expense.forEach(cat => {
+            defaultCategories.expense.forEach(c => {
                 const opt = document.createElement('option');
-                opt.value = cat.id;
-                opt.innerText = cat.name;
+                opt.value = c.id;
+                opt.innerText = c.name;
                 select.appendChild(opt);
             });
-
             document.getElementById('budget-limit').value = '';
             openModal('budget-modal');
         }
 
-        function quickEditBudget(catId, currentLimit) {
+        function quickEditBudget(id, limit) {
             openBudgetModal();
-            document.getElementById('budget-category').value = catId;
-            document.getElementById('budget-limit').value = currentLimit || '';
+            document.getElementById('budget-category').value = id;
+            document.getElementById('budget-limit').value = limit || '';
         }
 
         function saveBudget(e) {
             e.preventDefault();
             const cat = document.getElementById('budget-category').value;
             const limit = parseFloat(document.getElementById('budget-limit').value);
-
-            if (isNaN(limit) || limit < 0) {
-                showToast("จำนวนเงินเป้าหมายไม่ถูกต้อง", "error");
-                return;
-            }
+            if (isNaN(limit) || limit < 0) return;
 
             state.budgets[cat] = limit;
             saveStateToStorage();
             closeModal('budget-modal');
             renderBudgets();
-            showToast("อัปเดตเพดานต้นทุนฟิกคอสสำเร็จ");
+            showToast("อัปเดตเพดานเป้าหมายงบประมาณคงที่สำเร็จแล้ว");
         }
 
-        // --- 9. Database Backup & Export/Import ---
+        // --- 8. Dashboard Math & Charts ---
+        function updateDashboardStats() {
+            let totalIncome = 0;
+            let totalExpense = 0;
+            let foodCost = 0;
+
+            state.transactions.forEach(t => {
+                if (t.type === 'income') totalIncome += t.amount;
+                else {
+                    totalExpense += t.amount;
+                    if (t.category === 'raw-mat') foodCost += t.amount;
+                }
+            });
+
+            const profit = totalIncome - totalExpense;
+            const foodCostPct = totalIncome > 0 ? Math.round((foodCost / totalIncome) * 100) : 0;
+
+            document.getElementById('stat-income').innerText = `฿${totalIncome.toLocaleString('th-TH')}`;
+            document.getElementById('stat-expense').innerText = `฿${totalExpense.toLocaleString('th-TH')}`;
+            document.getElementById('stat-profit').innerText = `฿${profit.toLocaleString('th-TH')}`;
+            
+            const costPercentElem = document.getElementById('stat-foodcost-percent');
+            costPercentElem.innerText = `${foodCostPct}%`;
+
+            if (foodCostPct > 40) {
+                costPercentElem.className = "text-2xl font-bold text-rose-600 mt-1";
+                document.getElementById('stat-foodcost-desc').innerText = "เตือน: ต้นทุนอาหารเกิน 40% เสี่ยงขาดทุน";
+            } else {
+                costPercentElem.className = "text-2xl font-bold text-emerald-600 mt-1";
+                document.getElementById('stat-foodcost-desc').innerText = "สัดส่วนควบคุมดีเยี่ยม (เป้าหมาย < 35-40%)";
+            }
+
+            populateDashboardRecent();
+            populateStockAlerts();
+        }
+
+        function populateDashboardRecent() {
+            const container = document.getElementById('recent-transactions-list');
+            container.innerHTML = '';
+            const sorted = [...state.transactions].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+
+            if (sorted.length === 0) {
+                container.innerHTML = '<div class="text-center py-10 text-slate-400 text-xs">ไม่มีรายการธุรกรรมเวลานี้</div>';
+                return;
+            }
+
+            sorted.forEach(t => {
+                const isInc = t.type === 'income';
+                container.insertAdjacentHTML('beforeend', `
+                    <div class="flex items-center justify-between p-3 border border-slate-100 rounded-xl">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 rounded-lg ${isInc ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}">
+                                <i data-lucide="${isInc ? 'trending-up' : 'trending-down'}" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-xs font-semibold">${t.title}</h6>
+                                <span class="text-[10px] text-slate-400">${formatThaiDateShort(t.date)}</span>
+                            </div>
+                        </div>
+                        <span class="text-xs font-bold ${isInc ? 'text-emerald-600' : 'text-slate-800'}">
+                            ${isInc ? '+' : '-'}฿${t.amount.toLocaleString()}
+                        </span>
+                    </div>
+                `);
+            });
+            lucide.createIcons();
+        }
+
+        function populateStockAlerts() {
+            const container = document.getElementById('dashboard-stock-alerts');
+            container.innerHTML = '';
+            
+            const lowStocks = state.inventory.filter(i => i.quantity <= 5);
+
+            if (lowStocks.length === 0) {
+                container.innerHTML = '<div class="text-center py-10 text-emerald-600 font-semibold text-xs">🍀 วัตถุดิบและของสดทุกชิ้นมีปริมาณเพียงพอ</div>';
+                return;
+            }
+
+            lowStocks.forEach(i => {
+                container.insertAdjacentHTML('beforeend', `
+                    <div class="flex items-center justify-between p-3 border border-rose-100 bg-rose-50/25 rounded-xl">
+                        <div class="flex items-center gap-2">
+                            <span class="text-rose-600"><i data-lucide="alert-triangle" class="w-4 h-4"></i></span>
+                            <span class="text-xs font-bold text-slate-800">${i.name}</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs font-bold text-rose-600">${i.quantity} ${i.unit} เหลือต่ำกว่าเกณฑ์!</span>
+                        </div>
+                    </div>
+                `);
+            });
+            lucide.createIcons();
+        }
+
+        function renderCharts() {
+            if (flowChartInstance) flowChartInstance.destroy();
+            if (categoryChartInstance) categoryChartInstance.destroy();
+
+            // Line/Bar Chart (Trend)
+            const latest = [...state.transactions].sort((a,b) => new Date(a.date) - new Date(b.date)).slice(-7);
+            const labels = latest.map(t => formatThaiDateShort(t.date));
+            const incomes = latest.map(t => t.type === 'income' ? t.amount : 0);
+            const expenses = latest.map(t => t.type === 'expense' ? t.amount : 0);
+
+            const ctxFlow = document.getElementById('flowChart').getContext('2d');
+            flowChartInstance = new Chart(ctxFlow, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'ยอดขาย (฿)', data: incomes, backgroundColor: '#10b981', borderRadius: 5 },
+                        { label: 'รายจ่ายร้าน (฿)', data: expenses, backgroundColor: '#f43f5e', borderRadius: 5 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { font: { family: 'Prompt' } } },
+                        x: { ticks: { font: { family: 'Prompt' } } }
+                    }
+                }
+            });
+
+            // Expense Categories Breakdown Donut
+            const breakdownData = {};
+            state.transactions.forEach(t => {
+                if (t.type === 'expense') {
+                    breakdownData[t.category] = (breakdownData[t.category] || 0) + t.amount;
+                }
+            });
+
+            const catLabels = [];
+            const catAmounts = [];
+            const catColors = [];
+
+            defaultCategories.expense.forEach(c => {
+                if (breakdownData[c.id]) {
+                    catLabels.push(c.name);
+                    catAmounts.push(breakdownData[c.id]);
+                    catColors.push(c.text);
+                }
+            });
+
+            if (catAmounts.length === 0) {
+                catLabels.push('ไม่มีรายจ่ายบันทึก');
+                catAmounts.push(1);
+                catColors.push('#cbd5e1');
+            }
+
+            const ctxCat = document.getElementById('categoryChart').getContext('2d');
+            categoryChartInstance = new Chart(ctxCat, {
+                type: 'doughnut',
+                data: {
+                    labels: catLabels,
+                    datasets: [{ data: catAmounts, backgroundColor: catColors }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { font: { family: 'Prompt', size: 10 } } } }
+                }
+            });
+        }
+
+        // --- 9. Utility Helpers ---
+        function translateCat(id) {
+            const dictionary = {
+                'raw-meat': 'เนื้อสัตว์สดและซีฟู้ด',
+                'vegetables': 'ผักสดและสมุนไพร',
+                'dry-goods': 'เครื่องปรุงและของแห้ง',
+                'beverages': 'เครื่องดื่มและน้ำแข็ง'
+            };
+            return dictionary[id] || id;
+        }
+
+        function formatThaiDate(dateString) {
+            const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+            const d = new Date(dateString);
+            return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()+543}`;
+        }
+
+        function formatThaiDateShort(dateString) {
+            const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+            const d = new Date(dateString);
+            return `${d.getDate()} ${months[d.getMonth()]}`;
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            if (id === 'transaction-modal') {
+                document.getElementById('transaction-form').reset();
+                document.getElementById('trans-id').value = '';
+                document.getElementById('modal-title').innerText = "เพิ่มรายการรายรับ-รายจ่ายร้านอาหาร";
+                toggleFormType('income');
+            }
+        }
+
+        function showToast(message, type = "success") {
+            const toast = document.getElementById('toast-box');
+            document.getElementById('toast-message').innerText = message;
+            toast.classList.remove('translate-y-[-120%]', 'opacity-0', 'pointer-events-none');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-[-120%]', 'opacity-0', 'pointer-events-none');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3500);
+        }
+
+        // --- 10. Backup offline ---
         function exportData() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `resacc_backup_${new Date().toISOString().split('T')[0]}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-            showToast("ส่งออกข้อมูลสำรองเสร็จสมบูรณ์");
+            const download = document.createElement('a');
+            download.setAttribute("href", dataStr);
+            download.setAttribute("download", `resacc_backup_${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(download);
+            download.click();
+            download.remove();
+            showToast("ส่งออกไฟล์สำรองสำเร็จ!");
         }
 
         function importData(event) {
@@ -1511,53 +1534,28 @@
             reader.onload = function(e) {
                 try {
                     const parsed = JSON.parse(e.target.result);
-                    if (Array.isArray(parsed.transactions) && typeof parsed.budgets === 'object' && Array.isArray(parsed.inventory)) {
+                    if (Array.isArray(parsed.transactions) && Array.isArray(parsed.inventory)) {
                         state = parsed;
                         saveStateToStorage();
-                        showToast("กู้คืนระบบประวัติทั้งหมดเรียบร้อยแล้ว!");
+                        showToast("นำเข้าไฟล์ข้อมูลสำรองสำเร็จ!");
                         switchTab('dashboard');
                     } else {
-                        showToast("โครงสร้างไฟล์ข้อมูลไม่ถูกต้องสำหรับระบบร้านอาหาร", "error");
+                        showToast("รูปแบบไฟล์สำรองไม่ถูกต้อง!", "error");
                     }
-                } catch(err) {
-                    showToast("ไม่สามารถเรียกค้นและอ่านไฟล์นี้ได้", "error");
+                } catch(e) {
+                    showToast("เกิดข้อผิดพลาดในการโหลดไฟล์", "error");
                 }
             };
             reader.readAsText(file);
         }
 
         function wipeAllData() {
-            // Avoid standard alert confirm per prompt guidelines but use confirm carefully as inline.
-            // Using confirm here to ensure double-verification of complete system wipeout.
-            if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบยอดประวัติ คลังสต็อก และบัญชีของร้านทั้งหมด? ข้อมูลเดิมจะสูญหายทันที")) {
-                localStorage.removeItem('resacc_state_v2');
-                state.transactions = [];
-                state.inventory = [];
-                state.budgets = {};
-                saveStateToStorage();
-                showToast("เริ่มระบบฐานข้อมูลหลังบ้านเป็นค่าเริ่มต้น", "success");
+            if (confirm("ลบข้อมูลทั้งหมด ประวัติรายรับรายจ่าย สต็อกคลัง และงบจำกัดทั้งหมดใช่ไหม?")) {
+                localStorage.removeItem('resacc_state_v1');
+                loadDefaults();
+                showToast("ล้างฐานข้อมูลประวัติทั้งหมดสำเร็จ");
                 switchTab('dashboard');
             }
-        }
-
-        // --- 10. Date Format Helpers ---
-        const thaiMonths = [
-            'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.',
-            'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'
-        ];
-        
-        function formatThaiDate(dateString) {
-            if (!dateString) return '';
-            const d = new Date(dateString);
-            if (isNaN(d.getTime())) return dateString;
-            return `${d.getDate()} ${thaiMonths[d.getMonth()]} ${d.getFullYear() + 543}`;
-        }
-
-        function formatThaiDateShort(dateString) {
-            if (!dateString) return '';
-            const d = new Date(dateString);
-            if (isNaN(d.getTime())) return dateString;
-            return `${d.getDate()} ${thaiMonths[d.getMonth()]}`;
         }
     </script>
 </body>
