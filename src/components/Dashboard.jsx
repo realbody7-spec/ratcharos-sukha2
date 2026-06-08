@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 export default function Dashboard({ 
   transactions, 
   budgets, 
-  onAddTransaction
+  onAddTransaction,
+  getParentBudgetCategory
 }) {
   // Filters local to the Transactions tab
   const [searchTerm, setSearchTerm] = useState('');
@@ -75,7 +76,8 @@ export default function Dashboard({
     const titleMatch = (tx.title || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
                        (tx.notes || '').toLowerCase().includes(searchTerm.toLowerCase());
     const typeMatch = filterType === 'all' || tx.type === filterType;
-    const catMatch = filterCategory === 'all' || tx.category === filterCategory;
+    const stdCategory = getParentBudgetCategory ? getParentBudgetCategory(tx) : tx.category;
+    const catMatch = filterCategory === 'all' || tx.category === filterCategory || stdCategory === filterCategory;
     return titleMatch && typeMatch && catMatch;
   });
 

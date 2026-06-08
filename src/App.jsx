@@ -4,7 +4,81 @@ import Dashboard from './components/Dashboard';
 import Inventory from './components/Inventory';
 import Settings from './components/Settings';
 import BarChart from './components/BarChart';
-import PieChart, { getTransactionCategory } from './components/PieChart';
+import PieChart, { getTransactionCategory, getParentBudgetCategory } from './components/PieChart';
+
+// Helper to normalize transaction keys from Google Sheets (handles case variations and Thai headers)
+function normalizeTransaction(t) {
+  if (!t) return t;
+  const normalized = {};
+  
+  const keyMap = {
+    id: ['id', 'รหัส', 'id/รหัส'],
+    type: ['type', 'ประเภท', 'รับ/จ่าย'],
+    title: ['title', 'รายการ', 'ชื่อรายการ', 'คำอธิบาย'],
+    amount: ['amount', 'ยอดเงิน', 'จำนวนเงิน', 'ราคา', 'ยอดรวม', 'เงิน'],
+    date: ['date', 'วันที่'],
+    category: ['category', 'หมวดหมู่', 'ประเภทรายจ่าย'],
+    notes: ['notes', 'หมายเหตุ', 'คำอธิบายเพิ่มเติม'],
+    itemName: ['itemname', 'item_name', 'itemName', 'สินค้าคงคลัง', 'สินค้า', 'ชนิดวัตถุดิบ'],
+    quantity: ['quantity', 'จำนวน', 'ปริมาณ'],
+    unit: ['unit', 'หน่วย', 'หน่วยนับ'],
+    pricePerUnit: ['priceperunit', 'price_per_unit', 'pricePerUnit', 'ราคาต่อหน่วย', 'ราคาทุนต่อหน่วย']
+  };
+
+  Object.keys(t).forEach(rawKey => {
+    const cleanRawKey = rawKey.trim().toLowerCase();
+    let foundStandardKey = null;
+    for (const [stdKey, variants] of Object.entries(keyMap)) {
+      if (stdKey.toLowerCase() === cleanRawKey || 
+          variants.some(v => v.toLowerCase() === cleanRawKey)) {
+        foundStandardKey = stdKey;
+        break;
+      }
+    }
+    
+    if (foundStandardKey) {
+      normalized[foundStandardKey] = t[rawKey];
+    } else {
+      normalized[rawKey] = t[rawKey];
+    }
+  });
+
+  return normalized;
+}
+
+// Helper to normalize inventory keys from Google Sheets
+function normalizeInventory(item) {
+  if (!item) return item;
+  const normalized = {};
+  const keyMap = {
+    id: ['id', 'รหัส'],
+    name: ['name', 'ชื่อ', 'ชื่อวัตถุดิบ', 'ชื่อสินค้า', 'ชื่อวัตถุดิบ/สินค้า'],
+    category: ['category', 'หมวดหมู่'],
+    quantity: ['quantity', 'จำนวน', 'ปริมาณ', 'จำนวนคงเหลือ'],
+    unit: ['unit', 'หน่วย'],
+    costPerUnit: ['costperunit', 'cost_per_unit', 'costPerUnit', 'ราคาทุนล่าสุด', 'ราคาต่อหน่วย', 'ทุนต่อหน่วย', 'cost', 'ราคาทุน']
+  };
+
+  Object.keys(item).forEach(rawKey => {
+    const cleanRawKey = rawKey.trim().toLowerCase();
+    let foundStandardKey = null;
+    for (const [stdKey, variants] of Object.entries(keyMap)) {
+      if (stdKey.toLowerCase() === cleanRawKey || 
+          variants.some(v => v.toLowerCase() === cleanRawKey)) {
+        foundStandardKey = stdKey;
+        break;
+      }
+    }
+    
+    if (foundStandardKey) {
+      normalized[foundStandardKey] = item[rawKey];
+    } else {
+      normalized[rawKey] = item[rawKey];
+    }
+  });
+
+  return normalized;
+}
 
 export default function App() {
   // Navigation State
@@ -67,19 +141,20 @@ export default function App() {
         if (data.error) {
           setErrorMsg(data.error);
         } else {
-          // Format transactions date and sort descending
+          // Format transactions date, normalize fields, and sort descending
           const formattedTx = (data.transactions || []).map(t => {
-            let dt = t.date;
+            const normalized = normalizeTransaction(t);
+            let dt = normalized.date;
             if (dt && typeof dt === 'string' && dt.includes('T')) {
               dt = dt.split('T')[0];
             } else if (dt && typeof dt === 'object') {
               dt = new Date(dt).toISOString().split('T')[0];
             }
-            return { ...t, date: dt };
+            return { ...normalized, date: dt };
           }).sort((a,b) => new Date(b.date) - new Date(a.date));
 
           setTransactions(formattedTx);
-          setInventory(data.inventory || []);
+          setInventory((data.inventory || []).map(item => normalizeInventory(item)));
           if (data.budgets && Object.keys(data.budgets).length > 0) {
             setBudgets(data.budgets);
           }
@@ -217,7 +292,7 @@ export default function App() {
       totalIncome += amt;
     } else {
       totalExpense += amt;
-      if (tx.category === 'raw-mat') {
+      if (getParentBudgetCategory(tx) === 'raw-mat') {
         foodCostExpense += amt;
       }
     }
@@ -536,7 +611,7 @@ export default function App() {
                   <div className="budget-grid">
                     {Object.entries(budgets).map(([cat, limit]) => {
                       const actual = filteredTransactions
-                        .filter(tx => tx.type === 'expense' && tx.category === cat)
+                        .filter(tx => tx.type === 'expense' && getParentBudgetCategory(tx) === cat)
                         .reduce((acc, curr) => acc + (parseFloat(curr.amount) || 0), 0);
                       
                       const pct = Math.min((actual / limit) * 100, 100);
@@ -596,6 +671,7 @@ export default function App() {
                 transactions={filteredTransactions} 
                 budgets={budgets}
                 onAddTransaction={handleAddTransaction}
+                getParentBudgetCategory={getParentBudgetCategory}
                 selectedYear={selectedYear}
                 setSelectedYear={setSelectedYear}
                 selectedMonth={selectedMonth}

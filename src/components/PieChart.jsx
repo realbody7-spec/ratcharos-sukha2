@@ -1,18 +1,53 @@
 import React, { useState } from 'react';
 
 // Helper to classify category (re-declared/exported to match App.jsx filter logic)
+// Helper to classify category (re-declared/exported to match App.jsx filter logic)
 export function getTransactionCategory(tx) {
   if (tx.type !== 'expense') return null;
   const title = (tx.title || "").toLowerCase();
   const itemName = (tx.itemName || "").trim();
-  const cat = (tx.category || "").toLowerCase();
+  const cat = (tx.category || "").toLowerCase().trim();
+
+  // Define target sub-categories
+  const targetCategories = [
+    "เนื้อเช้า",
+    "เนื้อบุฟ หมูบุฟ",
+    "เนื้อบด",
+    "หมู ลูกชิ้น",
+    "หม่าล่า",
+    "เอส",
+    "เบียร์ เหล้า",
+    "ผัก",
+    "แมคโคร",
+    "ค่าเช่า",
+    "ค่าจ้างพนักงาน",
+    "ค่าการตลาด",
+    "ค่าแก๊ส",
+    "ค่าน้ำ ค่าไฟ อื่นๆ"
+  ];
+
+  // 0. Direct match on category value (handles direct sheet edits or manual input)
+  const foundCatDirect = targetCategories.find(c => c.toLowerCase() === cat);
+  if (foundCatDirect) return foundCatDirect;
+
+  // Map parent category keys (English/Thai) if no specific item match is found later
+  if (cat === 'fixed-rent' || cat === 'ค่าเช่า') return 'ค่าเช่า';
+  if (cat === 'fixed-salary' || cat === 'ค่าจ้างพนักงาน') return 'ค่าจ้างพนักงาน';
+  if (cat === 'marketing' || cat === 'ค่าการตลาด') return 'ค่าการตลาด';
+  if (cat === 'utilities') {
+    if (title.includes('แก๊ส')) return 'ค่าแก๊ส';
+    return 'ค่าน้ำ ค่าไฟ อื่นๆ';
+  }
 
   // 1. Direct itemName match
   if (itemName) {
+    const foundItemDirect = targetCategories.find(c => c.toLowerCase() === itemName.toLowerCase());
+    if (foundItemDirect) return foundItemDirect;
+
     if (itemName.includes("เนื้อเช้า")) return "เนื้อเช้า";
     if (itemName.includes("เนื้อบุฟ") || itemName.includes("หมูบุฟ")) return "เนื้อบุฟ หมูบุฟ";
     if (itemName.includes("เนื้อบด")) return "เนื้อบด";
-    if (itemName.includes("หมู ลูกชิ้น") || itemName.includes("ลูกชิ้น")) return "หมู ลูกชิ้น";
+    if (itemName.includes("หมู") || itemName.includes("ลูกชิ้น")) return "หมู ลูกชิ้น";
     if (itemName.includes("หม่าล่า")) return "หม่าล่า";
     if (itemName.includes("เอส")) return "เอส";
     if (itemName.includes("เบียร์") || itemName.includes("เหล้า")) return "เบียร์ เหล้า";
@@ -25,23 +60,44 @@ export function getTransactionCategory(tx) {
     if (itemName.includes("น้ำ") || itemName.includes("ไฟ")) return "ค่าน้ำ ค่าไฟ อื่นๆ";
   }
 
-  // 2. Keyword check
+  // 2. Keyword check in title
   if (title.includes("เนื้อเช้า")) return "เนื้อเช้า";
   if (title.includes("เนื้อบุฟ") || title.includes("หมูบุฟ")) return "เนื้อบุฟ หมูบุฟ";
   if (title.includes("เนื้อบด")) return "เนื้อบด";
-  if (title.includes("หมู ลูกชิ้น") || title.includes("ลูกชิ้น")) return "หมู ลูกชิ้น";
+  if (title.includes("หมู") || title.includes("ลูกชิ้น")) return "หมู ลูกชิ้น";
   if (title.includes("หม่าล่า")) return "หม่าล่า";
   if (title.includes("เอส")) return "เอส";
   if (title.includes("เบียร์") || title.includes("เหล้า")) return "เบียร์ เหล้า";
   if (title.includes("ผัก")) return "ผัก";
   if (title.includes("แมคโคร") || title.includes("makro")) return "แมคโคร";
-  if (cat === "fixed-rent" || title.includes("เช่า") || title.includes("ค่าเช่า")) return "ค่าเช่า";
-  if (cat === "fixed-salary" || title.includes("เงินเดือน") || title.includes("ค่าจ้าง") || title.includes("พนักงาน")) return "ค่าจ้างพนักงาน";
-  if (cat === "marketing" || title.includes("โฆษณา") || title.includes("การตลาด") || title.includes("แอด") || title.includes("ads")) return "ค่าการตลาด";
+  if (title.includes("เช่า") || title.includes("ค่าเช่า")) return "ค่าเช่า";
+  if (title.includes("เงินเดือน") || title.includes("ค่าจ้าง") || title.includes("พนักงาน")) return "ค่าจ้างพนักงาน";
+  if (title.includes("โฆษณา") || title.includes("การตลาด") || title.includes("แอด") || title.includes("ads")) return "ค่าการตลาด";
   if (title.includes("แก๊ส")) return "ค่าแก๊ส";
-  if (cat === "utilities" || title.includes("น้ำ") || title.includes("ไฟ")) return "ค่าน้ำ ค่าไฟ อื่นๆ";
+  if (title.includes("น้ำ") || title.includes("ไฟ")) return "ค่าน้ำ ค่าไฟ อื่นๆ";
   
+  // 3. Parent category fallback mapping
+  if (cat === "raw-mat") return "แมคโคร";
+  if (cat === "other-exp") return "ค่าน้ำ ค่าไฟ อื่นๆ";
+
   return "ค่าน้ำ ค่าไฟ อื่นๆ";
+}
+
+// Helper to map 14 sub-categories back to parent budget categories
+export function getParentBudgetCategory(tx) {
+  if (tx.type !== 'expense') return tx.category || 'dine-in';
+  const subCat = getTransactionCategory(tx);
+  if (!subCat) return 'other-exp';
+  
+  const rawMatSubCats = ["เนื้อเช้า", "เนื้อบุฟ หมูบุฟ", "เนื้อบด", "หมู ลูกชิ้น", "หม่าล่า", "เอส", "เบียร์ เหล้า", "ผัก", "แมคโคร"];
+  if (rawMatSubCats.includes(subCat)) return 'raw-mat';
+  
+  if (subCat === "ค่าเช่า") return 'fixed-rent';
+  if (subCat === "ค่าจ้างพนักงาน") return 'fixed-salary';
+  if (subCat === "ค่าแก๊ส" || subCat === "ค่าน้ำ ค่าไฟ อื่นๆ") return 'utilities';
+  if (subCat === "ค่าการตลาด") return 'marketing';
+  
+  return 'other-exp';
 }
 
 export default function PieChart({ transactions, selectedCategory, setSelectedCategory, setActiveTab }) {
