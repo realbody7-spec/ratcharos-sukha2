@@ -47,12 +47,12 @@ export default function Settings({ apiUrl, setApiUrl, useMock, setUseMock, onRef
         <h3>การตั้งค่าเชื่อมต่อ Google Sheets API</h3>
       </div>
       <div className="card-body">
-        <div className="form-group toggle-group">
-          <label className="toggle-label">
+        <div className="form-group toggle-group" style={{ cursor: 'pointer', userSelect: 'none' }} onClick={() => setUseMock(!useMock)}>
+          <div className="toggle-label">
             <span className="label-text">โหมดข้อมูลตัวอย่างจำลอง (Simulation Mode)</span>
             <span className="label-subtext">จำลองข้อมูลของร้านสำหรับการทดลองฟีเจอร์โดยไม่ต้องเชื่อมต่อฐานข้อมูลจริง</span>
-          </label>
-          <div className="switch-wrapper" style={{ cursor: 'pointer' }} onClick={() => setUseMock(!useMock)}>
+          </div>
+          <div className="switch-wrapper">
             <input
               type="checkbox"
               id="mock-toggle"
