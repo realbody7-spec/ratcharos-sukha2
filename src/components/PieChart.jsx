@@ -34,7 +34,11 @@ export function getTransactionCategory(tx) {
   if (foundCatDirect) return foundCatDirect;
 
   // Map category keywords directly
-  if (containsAny(cat, ["เบียร์", "เบีย", "เหล้า", "beer", "liquor", "ช้าง", "ลีโอ", "สิงห์", "spy", "wine", "ไวน์"])) return "เบียร์ เหล้า";
+  if (containsAny(cat, [
+    "เบียร์", "เบีย", "เบียร", "เหล้า", "beer", "liquor", "ช้าง", "ลีโอ", "สิงห์", "spy", "สปาย", 
+    "wine", "ไวน์", "รีเจนซี่", "regency", "แสงโสม", "โซจู", "soju", "ฟูลมูน", "fullmoon", 
+    "smirnoff", "สเมอร์นอฟ", "สุรา", "เมรัย", "แอลกอฮอล์"
+  ])) return "เบียร์ เหล้า";
   if (containsAny(cat, ["เนื้อเช้า", "เนื้อเชา", "เนื้อสด"])) return "เนื้อเช้า";
   if (containsAny(cat, ["เนื้อบุฟ", "หมูบุฟ", "บุฟเฟต์"])) return "เนื้อบุฟ หมูบุฟ";
   if (containsAny(cat, ["เนื้อบด"])) return "เนื้อบด";
@@ -61,8 +65,9 @@ export function getTransactionCategory(tx) {
     if (containsAny(itemName, ["หม่าล่า"])) return "หม่าล่า";
     if (containsAny(itemName, ["เอส", "est"])) return "เอส";
     if (containsAny(itemName, [
-      "เบียร์", "เบีย", "เหล้า", "beer", "liquor", "ช้าง", "ลีโอ", "สิงห์", "spy", 
-      "ไวน์", "wine", "รีเจนซี่", "regency", "แสงโสม", "โซจู", "soju"
+      "เบียร์", "เบีย", "เบียร", "เหล้า", "beer", "liquor", "ช้าง", "ลีโอ", "สิงห์", "spy", "สปาย", 
+      "ไวน์", "wine", "รีเจนซี่", "regency", "แสงโสม", "โซจู", "soju", "ฟูลมูน", "fullmoon", 
+      "smirnoff", "สเมอร์นอฟ", "สุรา", "เมรัย", "แอลกอฮอล์"
     ])) return "เบียร์ เหล้า";
     if (containsAny(itemName, ["ผัก"])) return "ผัก";
     if (containsAny(itemName, ["แมคโคร", "makro"])) return "แมคโคร";
@@ -84,8 +89,9 @@ export function getTransactionCategory(tx) {
   if (containsAny(title, ["หม่าล่า"])) return "หม่าล่า";
   if (containsAny(title, ["เอส", "est"])) return "เอส";
   if (containsAny(title, [
-    "เบียร์", "เบีย", "เหล้า", "beer", "liquor", "ช้าง", "ลีโอ", "สิงห์", "spy", 
-    "ไวน์", "wine", "รีเจนซี่", "regency", "แสงโสม", "โซจู", "soju"
+    "เบียร์", "เบีย", "เบียร", "เหล้า", "beer", "liquor", "ช้าง", "ลีโอ", "สิงห์", "spy", "สปาย", 
+    "ไวน์", "wine", "รีเจนซี่", "regency", "แสงโสม", "โซจู", "soju", "ฟูลมูน", "fullmoon", 
+    "smirnoff", "สเมอร์นอฟ", "สุรา", "เมรัย", "แอลกอฮอล์"
   ])) return "เบียร์ เหล้า";
   if (containsAny(title, ["ผัก"])) return "ผัก";
   if (containsAny(title, ["แมคโคร", "makro"])) return "แมคโคร";

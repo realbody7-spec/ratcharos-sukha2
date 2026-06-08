@@ -43,6 +43,25 @@ function normalizeTransaction(t) {
     }
   });
 
+  // Normalize cell values for 'type' (receives/payments, income/expense)
+  if (normalized.type) {
+    const val = normalized.type.toString().toLowerCase().trim();
+    if (val.includes('รับ') || val.includes('รายรับ') || val.includes('income') || val.includes('ขาย') || val.includes('เข้า')) {
+      normalized.type = 'income';
+    } else {
+      normalized.type = 'expense';
+    }
+  } else {
+    // Guess type from title or category if not explicitly provided
+    const title = (normalized.title || '').toString().toLowerCase();
+    const cat = (normalized.category || '').toString().toLowerCase();
+    if (title.includes('ขาย') || title.includes('รับเงิน') || title.includes('ยอดขาย') || cat.includes('dine-in') || cat.includes('delivery') || cat.includes('catering')) {
+      normalized.type = 'income';
+    } else {
+      normalized.type = 'expense';
+    }
+  }
+
   return normalized;
 }
 
