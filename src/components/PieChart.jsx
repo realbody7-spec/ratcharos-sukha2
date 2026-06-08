@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 // Helper to classify category (re-declared/exported to match App.jsx filter logic)
 export function getTransactionCategory(tx) {
   if (tx.type !== 'expense') return null;
-  const title = (tx.title || "").toLowerCase();
-  const itemName = (tx.itemName || "").trim();
+  const title = (tx.title || "").toLowerCase().trim();
+  const itemName = (tx.itemName || "").toLowerCase().trim();
   const cat = (tx.category || "").toLowerCase().trim();
 
   // Define target sub-categories
@@ -26,55 +26,77 @@ export function getTransactionCategory(tx) {
     "ค่าน้ำ ค่าไฟ อื่นๆ"
   ];
 
-  // 0. Direct match on category value (handles direct sheet edits or manual input)
+  // Helper to check if a value matches any keyword in an array
+  const containsAny = (val, keywords) => keywords.some(k => val.includes(k));
+
+  // 0. Direct match or partial match on category value (handles direct sheet edits or manual input)
   const foundCatDirect = targetCategories.find(c => c.toLowerCase() === cat);
   if (foundCatDirect) return foundCatDirect;
 
-  // Map parent category keys (English/Thai) if no specific item match is found later
-  if (cat === 'fixed-rent' || cat === 'ค่าเช่า') return 'ค่าเช่า';
-  if (cat === 'fixed-salary' || cat === 'ค่าจ้างพนักงาน') return 'ค่าจ้างพนักงาน';
-  if (cat === 'marketing' || cat === 'ค่าการตลาด') return 'ค่าการตลาด';
-  if (cat === 'utilities') {
-    if (title.includes('แก๊ส')) return 'ค่าแก๊ส';
-    return 'ค่าน้ำ ค่าไฟ อื่นๆ';
-  }
+  // Map category keywords directly
+  if (containsAny(cat, ["เบียร์", "เบีย", "เหล้า", "beer", "liquor", "ช้าง", "ลีโอ", "สิงห์", "spy", "wine", "ไวน์"])) return "เบียร์ เหล้า";
+  if (containsAny(cat, ["เนื้อเช้า", "เนื้อเชา", "เนื้อสด"])) return "เนื้อเช้า";
+  if (containsAny(cat, ["เนื้อบุฟ", "หมูบุฟ", "บุฟเฟต์"])) return "เนื้อบุฟ หมูบุฟ";
+  if (containsAny(cat, ["เนื้อบด"])) return "เนื้อบด";
+  if (containsAny(cat, ["หมู", "ลูกชิ้น"])) return "หมู ลูกชิ้น";
+  if (containsAny(cat, ["หม่าล่า"])) return "หม่าล่า";
+  if (containsAny(cat, ["เอส", "est"])) return "เอส";
+  if (containsAny(cat, ["ผัก"])) return "ผัก";
+  if (containsAny(cat, ["แมคโคร", "makro"])) return "แมคโคร";
+  if (containsAny(cat, ["เช่า", "rent"])) return "ค่าเช่า";
+  if (containsAny(cat, ["จ้าง", "พนักงาน", "เงินเดือน", "salary"])) return "ค่าจ้างพนักงาน";
+  if (containsAny(cat, ["ตลาด", "marketing", "โฆษณา", "แอด"])) return "ค่าการตลาด";
+  if (containsAny(cat, ["แก๊ส"])) return "ค่าแก๊ส";
+  if (containsAny(cat, ["น้ำ", "ไฟ", "utilities"])) return "ค่าน้ำ ค่าไฟ อื่นๆ";
 
   // 1. Direct itemName match
   if (itemName) {
-    const foundItemDirect = targetCategories.find(c => c.toLowerCase() === itemName.toLowerCase());
+    const foundItemDirect = targetCategories.find(c => c.toLowerCase() === itemName);
     if (foundItemDirect) return foundItemDirect;
 
-    if (itemName.includes("เนื้อเช้า")) return "เนื้อเช้า";
-    if (itemName.includes("เนื้อบุฟ") || itemName.includes("หมูบุฟ")) return "เนื้อบุฟ หมูบุฟ";
-    if (itemName.includes("เนื้อบด")) return "เนื้อบด";
-    if (itemName.includes("หมู") || itemName.includes("ลูกชิ้น")) return "หมู ลูกชิ้น";
-    if (itemName.includes("หม่าล่า")) return "หม่าล่า";
-    if (itemName.includes("เอส")) return "เอส";
-    if (itemName.includes("เบียร์") || itemName.includes("เหล้า")) return "เบียร์ เหล้า";
-    if (itemName.includes("ผัก")) return "ผัก";
-    if (itemName.includes("แมคโคร")) return "แมคโคร";
-    if (itemName.includes("ค่าเช่า") || itemName.includes("เช่า")) return "ค่าเช่า";
-    if (itemName.includes("ค่าจ้าง") || itemName.includes("พนักงาน") || itemName.includes("เงินเดือน")) return "ค่าจ้างพนักงาน";
-    if (itemName.includes("การตลาด") || itemName.includes("โฆษณา")) return "ค่าการตลาด";
-    if (itemName.includes("แก๊ส")) return "ค่าแก๊ส";
-    if (itemName.includes("น้ำ") || itemName.includes("ไฟ")) return "ค่าน้ำ ค่าไฟ อื่นๆ";
+    if (containsAny(itemName, ["เนื้อเช้า", "เนื้อเชา", "เนื้อสด", "เนื้อวัว"])) return "เนื้อเช้า";
+    if (containsAny(itemName, ["เนื้อบุฟ", "หมูบุฟ", "เนื้อบุฟเฟต์", "หมูบุฟเฟต์"])) return "เนื้อบุฟ หมูบุฟ";
+    if (containsAny(itemName, ["เนื้อบด"])) return "เนื้อบด";
+    if (containsAny(itemName, ["หมู", "ลูกชิ้น"])) return "หมู ลูกชิ้น";
+    if (containsAny(itemName, ["หม่าล่า"])) return "หม่าล่า";
+    if (containsAny(itemName, ["เอส", "est"])) return "เอส";
+    if (containsAny(itemName, [
+      "เบียร์", "เบีย", "เหล้า", "beer", "liquor", "ช้าง", "ลีโอ", "สิงห์", "spy", 
+      "ไวน์", "wine", "รีเจนซี่", "regency", "แสงโสม", "โซจู", "soju"
+    ])) return "เบียร์ เหล้า";
+    if (containsAny(itemName, ["ผัก"])) return "ผัก";
+    if (containsAny(itemName, ["แมคโคร", "makro"])) return "แมคโคร";
+    if (containsAny(itemName, ["ค่าเช่า", "เช่า"])) return "ค่าเช่า";
+    if (containsAny(itemName, ["ค่าจ้าง", "พนักงาน", "เงินเดือน"])) return "ค่าจ้างพนักงาน";
+    if (containsAny(itemName, ["การตลาด", "โฆษณา", "marketing"])) return "ค่าการตลาด";
+    if (containsAny(itemName, ["แก๊ส"])) return "ค่าแก๊ส";
+    if (containsAny(itemName, ["น้ำ", "ไฟ"])) return "ค่าน้ำ ค่าไฟ อื่นๆ";
+    
+    // Fallback if itemName contains "เนื้อ" but not buffet or ground
+    if (itemName.includes("เนื้อ")) return "เนื้อเช้า";
   }
 
   // 2. Keyword check in title
-  if (title.includes("เนื้อเช้า")) return "เนื้อเช้า";
-  if (title.includes("เนื้อบุฟ") || title.includes("หมูบุฟ")) return "เนื้อบุฟ หมูบุฟ";
-  if (title.includes("เนื้อบด")) return "เนื้อบด";
-  if (title.includes("หมู") || title.includes("ลูกชิ้น")) return "หมู ลูกชิ้น";
-  if (title.includes("หม่าล่า")) return "หม่าล่า";
-  if (title.includes("เอส")) return "เอส";
-  if (title.includes("เบียร์") || title.includes("เหล้า")) return "เบียร์ เหล้า";
-  if (title.includes("ผัก")) return "ผัก";
-  if (title.includes("แมคโคร") || title.includes("makro")) return "แมคโคร";
-  if (title.includes("เช่า") || title.includes("ค่าเช่า")) return "ค่าเช่า";
-  if (title.includes("เงินเดือน") || title.includes("ค่าจ้าง") || title.includes("พนักงาน")) return "ค่าจ้างพนักงาน";
-  if (title.includes("โฆษณา") || title.includes("การตลาด") || title.includes("แอด") || title.includes("ads")) return "ค่าการตลาด";
-  if (title.includes("แก๊ส")) return "ค่าแก๊ส";
-  if (title.includes("น้ำ") || title.includes("ไฟ")) return "ค่าน้ำ ค่าไฟ อื่นๆ";
+  if (containsAny(title, ["เนื้อเช้า", "เนื้อเชา", "เนื้อสด", "เนื้อวัว"])) return "เนื้อเช้า";
+  if (containsAny(title, ["เนื้อบุฟ", "หมูบุฟ", "เนื้อบุฟเฟต์", "หมูบุฟเฟต์"])) return "เนื้อบุฟ หมูบุฟ";
+  if (containsAny(title, ["เนื้อบด"])) return "เนื้อบด";
+  if (containsAny(title, ["หมู", "ลูกชิ้น"])) return "หมู ลูกชิ้น";
+  if (containsAny(title, ["หม่าล่า"])) return "หม่าล่า";
+  if (containsAny(title, ["เอส", "est"])) return "เอส";
+  if (containsAny(title, [
+    "เบียร์", "เบีย", "เหล้า", "beer", "liquor", "ช้าง", "ลีโอ", "สิงห์", "spy", 
+    "ไวน์", "wine", "รีเจนซี่", "regency", "แสงโสม", "โซจู", "soju"
+  ])) return "เบียร์ เหล้า";
+  if (containsAny(title, ["ผัก"])) return "ผัก";
+  if (containsAny(title, ["แมคโคร", "makro"])) return "แมคโคร";
+  if (containsAny(title, ["เช่า", "ค่าเช่า"])) return "ค่าเช่า";
+  if (containsAny(title, ["เงินเดือน", "ค่าจ้าง", "พนักงาน"])) return "ค่าจ้างพนักงาน";
+  if (containsAny(title, ["โฆษณา", "การตลาด", "แอด", "ads", "marketing"])) return "ค่าการตลาด";
+  if (containsAny(title, ["แก๊ส"])) return "ค่าแก๊ส";
+  if (containsAny(title, ["น้ำ", "ไฟ"])) return "ค่าน้ำ ค่าไฟ อื่นๆ";
+
+  // Fallback if title contains "เนื้อ" but not buffet or ground
+  if (title.includes("เนื้อ")) return "เนื้อเช้า";
   
   // 3. Parent category fallback mapping
   if (cat === "raw-mat") return "แมคโคร";

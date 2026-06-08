@@ -658,10 +658,15 @@ function mapCategory(inputCat, type) {
     // ตรวจจับชื่อวัตถุดิบและค่าใช้จ่ายต่าง ๆ เพื่อเปลี่ยนหมวดหมู่หลักให้ถูกต้อง
     if (
       norm.includes("วัตถุดิบ") || norm.includes("ของสด") || norm.includes("raw-mat") ||
-      norm.includes("เนื้อเช้า") || norm.includes("เนื้อบุฟ") || norm.includes("หมูบุฟ") ||
+      norm.includes("เนื้อเช้า") || norm.includes("เนื้อเชา") || norm.includes("เนื้อสด") || norm.includes("เนื้อวัว") ||
+      norm.includes("เนื้อบุฟ") || norm.includes("หมูบุฟ") || norm.includes("บุฟเฟต์") ||
       norm.includes("เนื้อบด") || norm.includes("หมู") || norm.includes("ลูกชิ้น") ||
-      norm.includes("หม่าล่า") || norm.includes("เอส") || norm.includes("เบียร์") ||
-      norm.includes("เหล้า") || norm.includes("ผัก") || norm.includes("แมคโคร")
+      norm.includes("หม่าล่า") || norm.includes("เอส") || 
+      norm.includes("เบียร์") || norm.includes("เบีย") || norm.includes("เหล้า") || 
+      norm.includes("ช้าง") || norm.includes("ลีโอ") || norm.includes("สิงห์") || 
+      norm.includes("spy") || norm.includes("แสงโสม") || norm.includes("รีเจนซี่") || 
+      norm.includes("โซจู") || norm.includes("ไวน์") || norm.includes("wine") || norm.includes("beer") ||
+      norm.includes("ผัก") || norm.includes("แมคโคร") || norm.includes("เนื้อ")
     ) {
       return "raw-mat";
     }
@@ -741,15 +746,18 @@ function parseTextTransaction(text) {
   } 
   // 2. คัดกรองรายจ่าย (วัตถุดิบและค่าใช้จ่ายของร้านราชรส)
   else {
-    if (normText.includes("เนื้อเช้า")) {
+    if (normText.includes("เนื้อเช้า") || normText.includes("เนื้อเชา") || normText.includes("เนื้อสด") || normText.includes("เนื้อวัว")) {
       category = "raw-mat";
       itemName = "เนื้อเช้า";
-    } else if (normText.includes("เนื้อบุฟ") || normText.includes("หมูบุฟ")) {
+    } else if (normText.includes("เนื้อบุฟ") || normText.includes("หมูบุฟ") || normText.includes("บุฟเฟต์")) {
       category = "raw-mat";
       itemName = "เนื้อบุฟ หมูบุฟ";
     } else if (normText.includes("เนื้อบด")) {
       category = "raw-mat";
       itemName = "เนื้อบด";
+    } else if (normText.includes("เนื้อ")) {
+      category = "raw-mat";
+      itemName = "เนื้อเช้า";
     } else if (normText.includes("หมู") || normText.includes("ลูกชิ้น")) {
       category = "raw-mat";
       itemName = "หมู ลูกชิ้น";
@@ -759,7 +767,12 @@ function parseTextTransaction(text) {
     } else if (normText.includes("เอส") && !normText.includes("เอสเอส")) {
       category = "raw-mat";
       itemName = "เอส";
-    } else if (normText.includes("เบียร์") || normText.includes("เหล้า")) {
+    } else if (
+      normText.includes("เบียร์") || normText.includes("เบีย") || normText.includes("เหล้า") || 
+      normText.includes("ช้าง") || normText.includes("ลีโอ") || normText.includes("สิงห์") || 
+      normText.includes("spy") || normText.includes("แสงโสม") || normText.includes("รีเจนซี่") || 
+      normText.includes("โซจู") || normText.includes("beer") || normText.includes("liquor") || normText.includes("wine") || normText.includes("ไวน์")
+    ) {
       category = "raw-mat";
       itemName = "เบียร์ เหล้า";
     } else if (normText.includes("ผัก")) {
