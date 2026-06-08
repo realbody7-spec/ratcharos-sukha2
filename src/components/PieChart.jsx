@@ -37,7 +37,7 @@ export function getTransactionCategory(tx) {
   if (containsAny(cat, [
     "เบียร์", "เบีย", "เบียร", "เหล้า", "beer", "liquor", "ช้าง", "ลีโอ", "สิงห์", "spy", "สปาย", 
     "wine", "ไวน์", "รีเจนซี่", "regency", "แสงโสม", "โซจู", "soju", "ฟูลมูน", "fullmoon", 
-    "smirnoff", "สเมอร์นอฟ", "สุรา", "เมรัย", "แอลกอฮอล์"
+    "smirnoff", "สเมอร์นอฟ", "สุรา", "เมรัย", "แอลกอฮอล์", "อานันท์", "มานิต"
   ])) return "เบียร์ เหล้า";
   if (containsAny(cat, ["เนื้อเช้า", "เนื้อเชา", "เนื้อสด"])) return "เนื้อเช้า";
   if (containsAny(cat, ["เนื้อบุฟ", "หมูบุฟ", "บุฟเฟต์"])) return "เนื้อบุฟ หมูบุฟ";
@@ -51,7 +51,7 @@ export function getTransactionCategory(tx) {
   if (containsAny(cat, ["จ้าง", "พนักงาน", "เงินเดือน", "salary"])) return "ค่าจ้างพนักงาน";
   if (containsAny(cat, ["ตลาด", "marketing", "โฆษณา", "แอด"])) return "ค่าการตลาด";
   if (containsAny(cat, ["แก๊ส"])) return "ค่าแก๊ส";
-  if (containsAny(cat, ["น้ำ", "ไฟ", "utilities"])) return "ค่าน้ำ ค่าไฟ อื่นๆ";
+  if (containsAny(cat, ["น้ำ", "ไฟ", "utilities", "อื่น", "อื่นๆ"])) return "ค่าน้ำ ค่าไฟ อื่นๆ";
 
   // 1. Direct itemName match
   if (itemName) {
@@ -67,7 +67,7 @@ export function getTransactionCategory(tx) {
     if (containsAny(itemName, [
       "เบียร์", "เบีย", "เบียร", "เหล้า", "beer", "liquor", "ช้าง", "ลีโอ", "สิงห์", "spy", "สปาย", 
       "ไวน์", "wine", "รีเจนซี่", "regency", "แสงโสม", "โซจู", "soju", "ฟูลมูน", "fullmoon", 
-      "smirnoff", "สเมอร์นอฟ", "สุรา", "เมรัย", "แอลกอฮอล์"
+      "smirnoff", "สเมอร์นอฟ", "สุรา", "เมรัย", "แอลกอฮอล์", "อานันท์", "มานิต"
     ])) return "เบียร์ เหล้า";
     if (containsAny(itemName, ["ผัก"])) return "ผัก";
     if (containsAny(itemName, ["แมคโคร", "makro"])) return "แมคโคร";
@@ -75,7 +75,7 @@ export function getTransactionCategory(tx) {
     if (containsAny(itemName, ["ค่าจ้าง", "พนักงาน", "เงินเดือน"])) return "ค่าจ้างพนักงาน";
     if (containsAny(itemName, ["การตลาด", "โฆษณา", "marketing"])) return "ค่าการตลาด";
     if (containsAny(itemName, ["แก๊ส"])) return "ค่าแก๊ส";
-    if (containsAny(itemName, ["น้ำ", "ไฟ"])) return "ค่าน้ำ ค่าไฟ อื่นๆ";
+    if (containsAny(itemName, ["น้ำ", "ไฟ", "อื่น", "อื่นๆ"])) return "ค่าน้ำ ค่าไฟ อื่นๆ";
     
     // Fallback if itemName contains "เนื้อ" but not buffet or ground
     if (itemName.includes("เนื้อ")) return "เนื้อเช้า";
@@ -91,7 +91,7 @@ export function getTransactionCategory(tx) {
   if (containsAny(title, [
     "เบียร์", "เบีย", "เบียร", "เหล้า", "beer", "liquor", "ช้าง", "ลีโอ", "สิงห์", "spy", "สปาย", 
     "ไวน์", "wine", "รีเจนซี่", "regency", "แสงโสม", "โซจู", "soju", "ฟูลมูน", "fullmoon", 
-    "smirnoff", "สเมอร์นอฟ", "สุรา", "เมรัย", "แอลกอฮอล์"
+    "smirnoff", "สเมอร์นอฟ", "สุรา", "เมรัย", "แอลกอฮอล์", "อานันท์", "มานิต"
   ])) return "เบียร์ เหล้า";
   if (containsAny(title, ["ผัก"])) return "ผัก";
   if (containsAny(title, ["แมคโคร", "makro"])) return "แมคโคร";
@@ -99,7 +99,7 @@ export function getTransactionCategory(tx) {
   if (containsAny(title, ["เงินเดือน", "ค่าจ้าง", "พนักงาน"])) return "ค่าจ้างพนักงาน";
   if (containsAny(title, ["โฆษณา", "การตลาด", "แอด", "ads", "marketing"])) return "ค่าการตลาด";
   if (containsAny(title, ["แก๊ส"])) return "ค่าแก๊ส";
-  if (containsAny(title, ["น้ำ", "ไฟ"])) return "ค่าน้ำ ค่าไฟ อื่นๆ";
+  if (containsAny(title, ["น้ำ", "ไฟ", "อื่น", "อื่นๆ"])) return "ค่าน้ำ ค่าไฟ อื่นๆ";
 
   // Fallback if title contains "เนื้อ" but not buffet or ground
   if (title.includes("เนื้อ")) return "เนื้อเช้า";

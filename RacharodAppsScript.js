@@ -744,7 +744,6 @@ function parseTextTransaction(text) {
     }
     title = "ยอดขายหน้าร้าน/จัดส่ง";
   } 
-  // 2. คัดกรองรายจ่าย (วัตถุดิบและค่าใช้จ่ายของร้านราชรส)
   else {
     if (normText.includes("เนื้อเช้า") || normText.includes("เนื้อเชา") || normText.includes("เนื้อสด") || normText.includes("เนื้อวัว")) {
       category = "raw-mat";
@@ -752,15 +751,15 @@ function parseTextTransaction(text) {
     } else if (normText.includes("เนื้อบุฟ") || normText.includes("หมูบุฟ") || normText.includes("บุฟเฟต์")) {
       category = "raw-mat";
       itemName = "เนื้อบุฟ หมูบุฟ";
-    } else if (normText.includes("เนื้อบด")) {
+    } else if (normText.includes("เนื้อบด") || normText.includes("หมูบด")) {
       category = "raw-mat";
       itemName = "เนื้อบด";
-    } else if (normText.includes("เนื้อ")) {
-      category = "raw-mat";
-      itemName = "เนื้อเช้า";
     } else if (normText.includes("หมู") || normText.includes("ลูกชิ้น")) {
       category = "raw-mat";
       itemName = "หมู ลูกชิ้น";
+    } else if (normText.includes("เนื้อ")) {
+      category = "raw-mat";
+      itemName = "เนื้อเช้า";
     } else if (normText.includes("หม่าล่า")) {
       category = "raw-mat";
       itemName = "หม่าล่า";
@@ -771,7 +770,8 @@ function parseTextTransaction(text) {
       normText.includes("เบียร์") || normText.includes("เบีย") || normText.includes("เหล้า") || 
       normText.includes("ช้าง") || normText.includes("ลีโอ") || normText.includes("สิงห์") || 
       normText.includes("spy") || normText.includes("แสงโสม") || normText.includes("รีเจนซี่") || 
-      normText.includes("โซจู") || normText.includes("beer") || normText.includes("liquor") || normText.includes("wine") || normText.includes("ไวน์")
+      normText.includes("โซจู") || normText.includes("beer") || normText.includes("liquor") || normText.includes("wine") || normText.includes("ไวน์") ||
+      normText.includes("อานันท์") || normText.includes("มานิต")
     ) {
       category = "raw-mat";
       itemName = "เบียร์ เหล้า";
