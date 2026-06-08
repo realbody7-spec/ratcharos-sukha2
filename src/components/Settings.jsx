@@ -8,7 +8,8 @@ export default function Settings({ apiUrl, setApiUrl, useMock, setUseMock, onRef
   const handleSave = () => {
     localStorage.setItem('racharod_api_url', tempUrl);
     setApiUrl(tempUrl);
-    setTestResult({ status: 'success', message: 'บันทึกการตั้งค่าเรียบร้อยแล้ว!' });
+    setUseMock(false); // Automatically disable simulation mode when saving a URL
+    setTestResult({ status: 'success', message: 'บันทึกการตั้งค่าและดึงข้อมูลจริงเรียบร้อยแล้ว!' });
     setTimeout(() => setTestResult(null), 3000);
     onRefresh();
   };
@@ -66,7 +67,7 @@ export default function Settings({ apiUrl, setApiUrl, useMock, setUseMock, onRef
 
         <hr className="divider" />
 
-        <div className="form-group" style={{ opacity: useMock ? 0.6 : 1, pointerEvents: useMock ? 'none' : 'auto' }}>
+        <div className="form-group">
           <label htmlFor="api-url" className="input-label">Google Apps Script Web App URL</label>
           <div className="input-with-button">
             <input
@@ -76,7 +77,6 @@ export default function Settings({ apiUrl, setApiUrl, useMock, setUseMock, onRef
               onChange={(e) => setTempUrl(e.target.value)}
               placeholder="https://script.google.com/macros/s/.../exec"
               className="glass-input"
-              disabled={useMock}
             />
           </div>
           <span className="input-hint">
@@ -95,7 +95,7 @@ export default function Settings({ apiUrl, setApiUrl, useMock, setUseMock, onRef
             type="button" 
             onClick={handleTestConnection} 
             className="btn btn-secondary"
-            disabled={useMock || testing}
+            disabled={testing || !tempUrl}
           >
             {testing ? 'กำลังทดสอบ...' : '🔌 ทดสอบการเชื่อมต่อ'}
           </button>
@@ -103,7 +103,7 @@ export default function Settings({ apiUrl, setApiUrl, useMock, setUseMock, onRef
             type="button" 
             onClick={handleSave} 
             className="btn btn-primary"
-            disabled={useMock}
+            disabled={!tempUrl}
           >
             💾 บันทึกและดึงข้อมูลจริง
           </button>

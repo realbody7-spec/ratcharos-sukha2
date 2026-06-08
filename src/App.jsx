@@ -56,7 +56,6 @@ export default function App() {
   const fetchLiveData = async () => {
     if (!apiUrl) {
       setErrorMsg('กรุณากรอก API URL ในหน้าเชื่อมต่อระบบคลาวด์');
-      setUseMock(true);
       return;
     }
     setLoading(true);
