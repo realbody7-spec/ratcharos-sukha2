@@ -1171,3 +1171,7 @@ body {
     display: none !important;
   }
 }
+/* Deploy trigger: 2026-06-08T20:20:00+07:00 */
+.deploy-trigger-1 { content: "2026-06-08-1"; }
+
+
