@@ -52,15 +52,15 @@ export default function Settings({ apiUrl, setApiUrl, useMock, setUseMock, onRef
             <span className="label-text">โหมดข้อมูลตัวอย่างจำลอง (Simulation Mode)</span>
             <span className="label-subtext">จำลองข้อมูลของร้านสำหรับการทดลองฟีเจอร์โดยไม่ต้องเชื่อมต่อฐานข้อมูลจริง</span>
           </label>
-          <div className="switch-wrapper">
+          <div className="switch-wrapper" style={{ cursor: 'pointer' }} onClick={() => setUseMock(!useMock)}>
             <input
               type="checkbox"
               id="mock-toggle"
               checked={useMock}
-              onChange={(e) => setUseMock(e.target.checked)}
+              readOnly
               className="switch-input"
             />
-            <label htmlFor="mock-toggle" className="switch-slider"></label>
+            <span className="switch-slider"></span>
           </div>
         </div>
 
