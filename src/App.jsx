@@ -13,16 +13,16 @@ function normalizeTransaction(t) {
   
   const keyMap = {
     id: ['id', 'รหัส', 'id/รหัส'],
-    type: ['type', 'ประเภท', 'รับ/จ่าย'],
-    title: ['title', 'รายการ', 'ชื่อรายการ', 'คำอธิบาย'],
-    amount: ['amount', 'ยอดเงิน', 'จำนวนเงิน', 'ราคา', 'ยอดรวม', 'เงิน'],
-    date: ['date', 'วันที่'],
-    category: ['category', 'หมวดหมู่', 'ประเภทรายจ่าย'],
+    type: ['type', 'ประเภท', 'รับ/จ่าย', 'รับ-จ่าย', 'ประเภทธุรกรรม', 'ประเภทรายการ', 'รายการรับ/จ่าย', 'รับจ่าย'],
+    title: ['title', 'รายการ', 'ชื่อรายการ', 'คำอธิบาย', 'รายละเอียด'],
+    amount: ['amount', 'ยอดเงิน', 'จำนวนเงิน', 'ราคา', 'ยอดรวม', 'เงิน', 'จำนวนเงิน (บาท)', 'ยอดเงิน (บาท)'],
+    date: ['date', 'วันที่', 'วัน', 'วันที่ทำรายการ'],
+    category: ['category', 'หมวดหมู่', 'ประเภทรายจ่าย', 'กลุ่ม'],
     notes: ['notes', 'หมายเหตุ', 'คำอธิบายเพิ่มเติม'],
-    itemName: ['itemname', 'item_name', 'itemName', 'สินค้าคงคลัง', 'สินค้า', 'ชนิดวัตถุดิบ'],
-    quantity: ['quantity', 'จำนวน', 'ปริมาณ'],
+    itemName: ['itemname', 'item_name', 'itemName', 'สินค้าคงคลัง', 'สินค้า', 'ชนิดวัตถุดิบ', 'ชื่อสินค้า', 'รายการสินค้า', 'ชื่อวัตถุดิบ', 'วัตถุดิบ', 'วัตถุดิบ/สินค้า', 'ชื่อสินค้า/วัตถุดิบ', 'สินค้า/วัตถิบ', 'สินค้าคงคลัง/วัตถุดิบ'],
+    quantity: ['quantity', 'จำนวน', 'ปริมาณ', 'qty'],
     unit: ['unit', 'หน่วย', 'หน่วยนับ'],
-    pricePerUnit: ['priceperunit', 'price_per_unit', 'pricePerUnit', 'ราคาต่อหน่วย', 'ราคาทุนต่อหน่วย']
+    pricePerUnit: ['priceperunit', 'price_per_unit', 'pricePerUnit', 'ราคาต่อหน่วย', 'ราคาทุนต่อหน่วย', 'ราคาทุนล่าสุด', 'ราคา/หน่วย', 'ทุน/หน่วย', 'ทุนต่อหน่วย']
   };
 
   Object.keys(t).forEach(rawKey => {
@@ -43,7 +43,7 @@ function normalizeTransaction(t) {
     }
   });
 
-  // Normalize cell values for 'type' (receives/payments, income/expense)
+  // 1. Normalize cell values for 'type' (receives/payments, income/expense)
   if (normalized.type) {
     const val = normalized.type.toString().toLowerCase().trim();
     if (val.includes('รับ') || val.includes('รายรับ') || val.includes('income') || val.includes('ขาย') || val.includes('เข้า')) {
@@ -62,6 +62,88 @@ function normalizeTransaction(t) {
     }
   }
 
+  // 2. Clean and parse amount (removes commas, currency symbols, and spaces)
+  if (normalized.amount !== undefined && normalized.amount !== null) {
+    if (typeof normalized.amount === 'string') {
+      const cleanAmt = normalized.amount.replace(/[^0-9.-]/g, ''); // allow negative for general support
+      normalized.amount = parseFloat(cleanAmt) || 0;
+    } else {
+      normalized.amount = parseFloat(normalized.amount) || 0;
+    }
+  } else {
+    normalized.amount = 0;
+  }
+
+  // 3. Clean and parse quantity
+  if (normalized.quantity !== undefined && normalized.quantity !== null && normalized.quantity !== '') {
+    if (typeof normalized.quantity === 'string') {
+      const cleanQty = normalized.quantity.replace(/[^0-9.-]/g, '');
+      normalized.quantity = cleanQty !== '' ? parseFloat(cleanQty) : '';
+    } else {
+      normalized.quantity = parseFloat(normalized.quantity);
+    }
+  } else {
+    normalized.quantity = '';
+  }
+
+  // 4. Clean and parse pricePerUnit
+  if (normalized.pricePerUnit !== undefined && normalized.pricePerUnit !== null && normalized.pricePerUnit !== '') {
+    if (typeof normalized.pricePerUnit === 'string') {
+      const cleanPPU = normalized.pricePerUnit.replace(/[^0-9.-]/g, '');
+      normalized.pricePerUnit = cleanPPU !== '' ? parseFloat(cleanPPU) : '';
+    } else {
+      normalized.pricePerUnit = parseFloat(normalized.pricePerUnit);
+    }
+  } else {
+    normalized.pricePerUnit = '';
+  }
+
+  // 5. Normalize date format (robust parsing for Thai BE years and slashes)
+  let dt = normalized.date;
+  if (dt) {
+    try {
+      let parsedDate = new Date(dt);
+      
+      // Handle string format manually to catch Thai BE years and slashes
+      if (typeof dt === 'string') {
+        const clean = dt.replace(/\//g, '-').trim();
+        const parts = clean.split('-');
+        if (parts.length === 3) {
+          let year = parseInt(parts[0]);
+          let month = parseInt(parts[1]);
+          let day = parseInt(parts[2]);
+          
+          if (parts[2].length === 4) { // DD-MM-YYYY format
+            year = parseInt(parts[2]);
+            month = parseInt(parts[1]);
+            day = parseInt(parts[0]);
+          }
+          
+          if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+            if (year > 2400) {
+              year -= 543; // Buddhist Era to Christian Era
+            }
+            dt = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            parsedDate = new Date(dt);
+          }
+        }
+      }
+      
+      if (!isNaN(parsedDate.getTime())) {
+        let y = parsedDate.getFullYear();
+        if (y > 2400) {
+          y -= 543;
+        }
+        const m = String(parsedDate.getMonth() + 1).padStart(2, '0');
+        const d = String(parsedDate.getDate()).padStart(2, '0');
+        dt = `${y}-${m}-${d}`;
+      }
+    } catch (e) {
+      console.error("Error parsing date:", e);
+    }
+    normalized.date = dt;
+  }
+
   return normalized;
 }
 
@@ -71,11 +153,11 @@ function normalizeInventory(item) {
   const normalized = {};
   const keyMap = {
     id: ['id', 'รหัส'],
-    name: ['name', 'ชื่อ', 'ชื่อวัตถุดิบ', 'ชื่อสินค้า', 'ชื่อวัตถุดิบ/สินค้า'],
+    name: ['name', 'ชื่อ', 'ชื่อวัตถุดิบ', 'ชื่อสินค้า', 'ชื่อวัตถุดิบ/สินค้า', 'วัตถุดิบ/สินค้า', 'สินค้า/วัตถุดิบ', 'สินค้าคงคลัง', 'วัตถุดิบ'],
     category: ['category', 'หมวดหมู่'],
-    quantity: ['quantity', 'จำนวน', 'ปริมาณ', 'จำนวนคงเหลือ'],
-    unit: ['unit', 'หน่วย'],
-    costPerUnit: ['costperunit', 'cost_per_unit', 'costPerUnit', 'ราคาทุนล่าสุด', 'ราคาต่อหน่วย', 'ทุนต่อหน่วย', 'cost', 'ราคาทุน']
+    quantity: ['quantity', 'จำนวน', 'ปริมาณ', 'จำนวนคงเหลือ', 'qty'],
+    unit: ['unit', 'หน่วย', 'หน่วยนับ'],
+    costPerUnit: ['costperunit', 'cost_per_unit', 'costPerUnit', 'ราคาทุนล่าสุด', 'ราคาต่อหน่วย', 'ทุนต่อหน่วย', 'cost', 'ราคาทุน', 'ราคา/หน่วย']
   };
 
   Object.keys(item).forEach(rawKey => {
@@ -95,6 +177,25 @@ function normalizeInventory(item) {
       normalized[rawKey] = item[rawKey];
     }
   });
+
+  // Clean numbers
+  if (normalized.quantity !== undefined && normalized.quantity !== null) {
+    if (typeof normalized.quantity === 'string') {
+      const cleanQty = normalized.quantity.replace(/[^0-9.-]/g, '');
+      normalized.quantity = parseFloat(cleanQty) || 0;
+    } else {
+      normalized.quantity = parseFloat(normalized.quantity) || 0;
+    }
+  }
+
+  if (normalized.costPerUnit !== undefined && normalized.costPerUnit !== null) {
+    if (typeof normalized.costPerUnit === 'string') {
+      const cleanCost = normalized.costPerUnit.replace(/[^0-9.-]/g, '');
+      normalized.costPerUnit = parseFloat(cleanCost) || 0;
+    } else {
+      normalized.costPerUnit = parseFloat(normalized.costPerUnit) || 0;
+    }
+  }
 
   return normalized;
 }
