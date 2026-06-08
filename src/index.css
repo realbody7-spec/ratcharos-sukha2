@@ -1004,7 +1004,7 @@ body {
    RESPONSIVE DESIGN & MOBILE OPTIMIZATIONS
    ========================================== */
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .charts-container-row {
     grid-template-columns: 1fr;
   }
@@ -1012,9 +1012,7 @@ body {
     grid-template-columns: 1fr;
     gap: 20px;
   }
-}
 
-@media (max-width: 768px) {
   /* Hide sidebar on mobile */
   .app-sidebar {
     display: none;
@@ -1163,5 +1161,12 @@ body {
   
   .card-body {
     padding: 16px;
+  }
+}
+
+/* Hide mobile elements on desktop */
+@media (min-width: 1025px) {
+  .md\:hidden {
+    display: none !important;
   }
 }
