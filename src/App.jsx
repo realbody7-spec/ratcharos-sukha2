@@ -6,6 +6,85 @@ import Settings from './components/Settings';
 import BarChart from './components/BarChart';
 import PieChart, { getTransactionCategory, getParentBudgetCategory } from './components/PieChart';
 
+// Helper to format a JS Date object into "YYYY-MM-DD" in Bangkok timezone
+function formatLocalDateToBangkok(d) {
+  try {
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Asia/Bangkok',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+    const parts = formatter.formatToParts(d);
+    const month = parts.find(p => p.type === 'month').value;
+    const day = parts.find(p => p.type === 'day').value;
+    let year = parseInt(parts.find(p => p.type === 'year').value);
+    if (year > 2400) {
+      year -= 543;
+    }
+    return `${year}-${month}-${day}`;
+  } catch (e) {
+    console.error("formatLocalDateToBangkok error:", e);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y > 2400 ? y - 543 : y}-${m}-${day}`;
+  }
+}
+
+// Helper to parse dates in various formats into a "YYYY-MM-DD" string in Bangkok timezone
+function parseDateToBangkokString(dt) {
+  if (!dt) return '';
+  
+  if (typeof dt === 'string') {
+    if (dt.includes('T')) {
+      try {
+        const d = new Date(dt);
+        if (!isNaN(d.getTime())) {
+          return formatLocalDateToBangkok(d);
+        }
+      } catch (e) {
+        console.error("Error parsing ISO date string:", e);
+      }
+    }
+    
+    let clean = dt.replace(/\//g, '-').trim();
+    clean = clean.split(' ')[0];
+    const parts = clean.split('-');
+    if (parts.length === 3) {
+      let year = parseInt(parts[0]);
+      let month = parseInt(parts[1]);
+      let day = parseInt(parts[2]);
+      
+      if (parts[2].length === 4) { // DD-MM-YYYY format
+        year = parseInt(parts[2]);
+        month = parseInt(parts[1]);
+        day = parseInt(parts[0]);
+      }
+      
+      if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+        if (year > 2400) {
+          year -= 543;
+        }
+        return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      }
+    }
+  }
+  
+  if (dt instanceof Date || (typeof dt === 'object' && dt !== null && typeof dt.getTime === 'function')) {
+    return formatLocalDateToBangkok(dt);
+  }
+  
+  try {
+    const d = new Date(dt);
+    if (!isNaN(d.getTime())) {
+      return formatLocalDateToBangkok(d);
+    }
+  } catch (e) {}
+  
+  return String(dt);
+}
+
 // Helper to normalize transaction keys from Google Sheets (handles case variations and Thai headers)
 function normalizeTransaction(t) {
   if (!t) return t;
@@ -19,7 +98,7 @@ function normalizeTransaction(t) {
     date: ['date', 'วันที่', 'วัน', 'วันที่ทำรายการ'],
     category: ['category', 'หมวดหมู่', 'ประเภทรายจ่าย', 'กลุ่ม'],
     notes: ['notes', 'หมายเหตุ', 'คำอธิบายเพิ่มเติม'],
-    itemName: ['itemname', 'item_name', 'itemName', 'สินค้าคงคลัง', 'สินค้า', 'ชนิดวัตถุดิบ', 'ชื่อสินค้า', 'รายการสินค้า', 'ชื่อวัตถุดิบ', 'วัตถุดิบ', 'วัตถุดิบ/สินค้า', 'ชื่อสินค้า/วัตถุดิบ', 'สินค้า/วัตถิบ', 'สินค้าคงคลัง/วัตถุดิบ'],
+    itemName: ['itemname', 'item_name', 'itemName', 'สินค้าคงคลัง', 'สินค้า', 'ชนิดวัตถุดิบ', 'ชื่อสินค้า', 'รายการสินค้า', 'ชื่อวัตถุดิบ', 'วัตถุดิบ', 'วัตถุดิบ/สินค้า', 'ชื่อสินค้า/วัตถิบ', 'สินค้า/วัตถิบ', 'สินค้าคงคลัง/วัตถุดิบ'],
     quantity: ['quantity', 'จำนวน', 'ปริมาณ', 'qty'],
     unit: ['unit', 'หน่วย', 'หน่วยนับ'],
     pricePerUnit: ['priceperunit', 'price_per_unit', 'pricePerUnit', 'ราคาต่อหน่วย', 'ราคาทุนต่อหน่วย', 'ราคาทุนล่าสุด', 'ราคา/หน่วย', 'ทุน/หน่วย', 'ทุนต่อหน่วย']
@@ -99,50 +178,7 @@ function normalizeTransaction(t) {
   }
 
   // 5. Normalize date format (robust parsing for Thai BE years and slashes)
-  let dt = normalized.date;
-  if (dt) {
-    try {
-      let parsedDate = new Date(dt);
-      
-      // Handle string format manually to catch Thai BE years and slashes
-      if (typeof dt === 'string') {
-        const clean = dt.replace(/\//g, '-').trim();
-        const parts = clean.split('-');
-        if (parts.length === 3) {
-          let year = parseInt(parts[0]);
-          let month = parseInt(parts[1]);
-          let day = parseInt(parts[2]);
-          
-          if (parts[2].length === 4) { // DD-MM-YYYY format
-            year = parseInt(parts[2]);
-            month = parseInt(parts[1]);
-            day = parseInt(parts[0]);
-          }
-          
-          if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
-            if (year > 2400) {
-              year -= 543; // Buddhist Era to Christian Era
-            }
-            dt = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            parsedDate = new Date(dt);
-          }
-        }
-      }
-      
-      if (!isNaN(parsedDate.getTime())) {
-        let y = parsedDate.getFullYear();
-        if (y > 2400) {
-          y -= 543;
-        }
-        const m = String(parsedDate.getMonth() + 1).padStart(2, '0');
-        const d = String(parsedDate.getDate()).padStart(2, '0');
-        dt = `${y}-${m}-${d}`;
-      }
-    } catch (e) {
-      console.error("Error parsing date:", e);
-    }
-    normalized.date = dt;
-  }
+  normalized.date = parseDateToBangkokString(normalized.date);
 
   return normalized;
 }
@@ -263,14 +299,7 @@ export default function App() {
         } else {
           // Format transactions date, normalize fields, and sort descending
           const formattedTx = (data.transactions || []).map(t => {
-            const normalized = normalizeTransaction(t);
-            let dt = normalized.date;
-            if (dt && typeof dt === 'string' && dt.includes('T')) {
-              dt = dt.split('T')[0];
-            } else if (dt && typeof dt === 'object') {
-              dt = new Date(dt).toISOString().split('T')[0];
-            }
-            return { ...normalized, date: dt };
+            return normalizeTransaction(t);
           }).sort((a,b) => new Date(b.date) - new Date(a.date));
 
           setTransactions(formattedTx);
